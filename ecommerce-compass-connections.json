@@ -1,0 +1,27 @@
+{
+  "type": "Compass Connections",
+  "version": {
+    "$numberInt": "1"
+  },
+  "connections": [
+    {
+      "id": "043084be-f90a-4b0f-b082-12bee81ee6ac",
+      "lastUsed": {
+        "$date": {
+          "$numberLong": "1715683325918"
+        }
+      },
+      "favorite": {
+        "name": "Ecommcerce v1",
+        "color": "color4"
+      },
+      "savedConnectionType": "favorite",
+      "connectionOptions": {
+        "connectionString": "mongodb://localhost:27017/ecommerce",
+        "oidc": {
+          "serializedState": "eyJvaWRjUGx1Z2luU3RhdGVWZXJzaW9uIjowLCJzdGF0ZSI6W119"
+        }
+      }
+    }
+  ]
+}
