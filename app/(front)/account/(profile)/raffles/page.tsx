@@ -2,7 +2,7 @@ import React from 'react';
 
 const AccountPage = () => {
   return (
-    <div>AccountPage</div>
+    <div>Raffles</div>
   )
 }
 

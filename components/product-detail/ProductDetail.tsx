@@ -24,6 +24,9 @@ import ImageMagnifier from "../products/ImageMagnifier";
 import ImageGallery from "../products/ImageGallery";
 import ProductReviews from "../products/ProductReviews";
 import reviewService from "@/lib/service/reviewService";
+import axios from "axios";
+import { ProductTypes } from "@/utils/definitions";
+import AddFavoriteButton from "./AddFavoriteButton";
 
 const ProductDetail = async ({ slug }: { slug: string }) => {
   // const [product, setProduct] = useState<ProductTypes>();
@@ -166,13 +169,7 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
                   <Shuffle size={16} weight="bold" />
                   <span>Karşılaştır</span>
                 </Button>
-                <Button
-                  variant="link"
-                  className="flex items-center space-x-1.5 text-sm font-semibold text-gray-600 p-0 h-auto"
-                >
-                  <Heart size={16} weight="bold" />
-                  <span>İstek Listesine Ekle</span>
-                </Button>
+                <AddFavoriteButton product={product ?? null} />
               </div>
               <div className="shrink-0 border h-[1px] w-full my-5"></div>
               <div className="flex flex-col space-y-1 text-sm">

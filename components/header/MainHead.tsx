@@ -1,16 +1,11 @@
 import React from "react";
 import Image from "next/image";
 import { Input } from "../ui/input";
-import {
-  Heart,
-  MagnifyingGlass,
-  ShoppingBag,
-  User,
-} from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import BasketSheet from "./BasketSheet";
 import { Button } from "../ui/button";
 import AccountMenu from "./AccountMenu";
+import FavoritesButton from "./FavoritesButton";
 
 const MainHead: React.FC = () => {
   return (
@@ -41,9 +36,7 @@ const MainHead: React.FC = () => {
           </div>
           <div className="flex items-center space-x-2">
             <AccountMenu />
-            <Button variant="ghost" className="h-12 rounded-xl">
-              <Heart size={24} />
-            </Button>
+            <FavoritesButton />
             <BasketSheet />
           </div>
         </div>
