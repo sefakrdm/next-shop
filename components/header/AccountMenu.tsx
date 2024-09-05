@@ -5,11 +5,11 @@ import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { User } from '@phosphor-icons/react/dist/ssr';
 import { signOut, useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const AccountMenu: React.FC = () => {
-
+    const pathname = usePathname();
     const router = useRouter();
 
     const signoutHandler = () => {
@@ -39,7 +39,7 @@ const AccountMenu: React.FC = () => {
         </DropdownMenu>
       ) : (
         <Link
-          href="/account/login"
+          href={`/account/login?callbackUrl=${pathname == "/account/login" || pathname == "/account/register" ? "/" : pathname}`}
           className="flex items-center space-x-2 rounded-xl bg-slate-100 hover:bg-blue-600 hover:text-white transition-all px-4 py-2 h-12"
         >
           <User size={24} />

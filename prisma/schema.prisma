@@ -1,0 +1,401 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User {
+  id              String         @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  surname         String
+  email           String         @unique
+  password        String
+  phone           String?        @unique
+  emailVerified   DateTime?
+  image           String?
+  birthday        DateTime?
+  gender          String?
+  role            UserRole       @default(USER)
+  lastLogin       DateTime?
+  accounts        Account[]
+  Address         Address[]
+  sessions        Session[]
+  // Optional for WebAuthn support
+  Authenticator   Authenticator[]
+ 
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  Favorite        Favorite[]
+  Order           Order[]
+  Review          Review[]
+
+}
+ 
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+ 
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+}
+ 
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+}
+ 
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @id @map("_id")
+  userId               String  @db.ObjectId
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([userId, credentialID])
+}
+
+model Address {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  name            String
+  surname         String
+  addressLine1    String
+  addressLine2    String
+  province        String
+  district        String
+  postalCode      String
+  userId          String          @db.ObjectId
+  phone           String
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  billingOrders   Order[] @relation("BillingAddress")
+  shippingOrders  Order[] @relation("ShippingAddress")
+}
+
+model Favorite {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String          @db.ObjectId
+  products      FavoriteProduct[]
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FavoriteProduct {
+  id                  String          @id @default(auto()) @map("_id") @db.ObjectId
+  productId           String          @db.ObjectId
+  favoriteId          String          @db.ObjectId
+
+  product             Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  favorite            Favorite        @relation(fields: [favoriteId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, favoriteId])
+}
+
+model Product {
+  id                  String          @id @default(auto()) @map("_id") @db.ObjectId
+  sku                 String
+  title               String
+  description         String?
+  shortDescription    String?
+  price               Json?
+  discountPercentage  Float?
+  stock               Int?
+  slug                String
+  images              Json?
+  categoryId          String?         @db.ObjectId
+  variants            Json?
+  isActive            Boolean         @default(true)
+  isFeatured          Boolean         @default(false)
+  isHomePage          Boolean         @default(false)
+  isNewProduct        Boolean         @default(false)
+  isBestSeller        Boolean         @default(false)
+  isFreeShipping      Boolean         @default(false)
+  transitions         Json?
+  brandId             String?         @db.ObjectId
+  isVariantProduct    Boolean         @default(false)
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  category            Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  brand               Brand?           @relation(fields: [brandId], references: [id], onDelete: SetNull)
+
+  favorites           FavoriteProduct[]
+  ProductVariant      ProductVariant[]
+  ProductImages       ProductImage[]
+  OrderItem           OrderItem[]
+  Review              Review[]
+
+  @@unique([slug])
+}
+
+model Brand {
+  id                  String          @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  slug                String
+  description         String?
+  shortDescription    String?
+  images              Json?
+  isActive            Boolean         @default(true)
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  Product             Product[]
+
+  @@unique([slug])
+}
+
+model Category {
+  id                  String          @id @default(auto()) @map("_id") @db.ObjectId
+  title               String
+  slug                String
+  description         String?
+  shortDescription    String?
+  translations        Json?
+  parentCategoryId    String?         @db.ObjectId
+  images              Json?
+  isActive            Boolean         @default(true)
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  Product             Product[]
+  childCategories     Category[]      @relation("ParentChildCategory")
+
+  parentCategory      Category?       @relation("ParentChildCategory", fields: [parentCategoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([slug])
+}
+
+model ProductVariant {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  productId           String         @db.ObjectId
+  price               Float
+  stock               Int
+  sku                 String
+  thumbnailImage      String[]
+  images              String[]
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  product             Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  VariantAttribute    VariantAttribute[]
+  OrderItem           OrderItem[]
+}
+
+model VariantAttribute {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  productVariantId    String         @db.ObjectId
+  attributeId         String         @db.ObjectId
+  value               String
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  productVariant      ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+  attribute           Attribute      @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+}
+
+model Attribute {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  VariantAttribute    VariantAttribute[]
+}
+
+model ProductImage {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  productId           String         @db.ObjectId
+  isMain              Boolean
+  isVideo             Boolean
+  order               Int
+  fileName            String
+  url                 String
+  alt                 String
+  caption             String
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  product             Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId              String         @db.ObjectId
+  status              String
+  paymentStatus       String
+  shippingStatus      String
+  total               Float
+  subtotal            Float
+  tax                 Float
+  discount            Float
+  shipping            Float
+  coupon              String
+  currency            String
+  paymentMethod       String
+  email               String
+  phone               String
+  billingAddressId    String         @db.ObjectId
+  shippingAddressId   String         @db.ObjectId
+  paymentId           String         @db.ObjectId
+  items               OrderItem[]
+  transactions        OrderTransaction[]
+  shippingMethodId    String         @db.ObjectId
+  
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  billingAddress      Address        @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  shippingAddress     Address        @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  shippingMethod      Shipping       @relation("shippingMethod", fields: [shippingMethodId], references: [id])
+  Payment             Payment        @relation("payment", fields: [paymentId], references: [id])
+}
+
+model OrderItem {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  orderId             String         @db.ObjectId
+  productId           String         @db.ObjectId
+  variantId           String         @db.ObjectId
+  quantity            Int
+  price               Float
+  total               Float
+  tax                 Float
+  discount            Float
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  order               Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product             Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant             ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+}
+
+model OrderTransaction {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  orderId             String         @db.ObjectId
+  transactionId       String
+  amount              Float
+  status              String
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  order               Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  rate                Float
+  comment             String
+  images              String[]
+  userName            String
+  userId              String         @db.ObjectId
+  productId           String         @db.ObjectId
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product             Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Shipping {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  title               String
+  image               String?
+  price               Float?
+  status              Boolean
+  apiKey              String?
+  privApiKey          String?
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  Order               Order[]        @relation("shippingMethod")
+
+  // Order Order[]
+}
+
+model Payment {
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  title               String
+  description         String?
+  image               String?
+  type                String
+  transactionCost     Float?
+  status              Boolean
+  queue               Int
+  apiKey              String?
+  privApiKey          String?
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  Order               Order[]        @relation("payment")
+}

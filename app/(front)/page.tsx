@@ -1,11 +1,10 @@
 import BigSlider from "@/components/index/BigSlider";
 import SaleProducts from "@/components/index/SaleProducts";
-import clientPromise from "@/lib/mongodb";
-import Image from "next/image";
 
 export default function Home() {
 
-  clientPromise
+  // const session = await auth();
+  // console.log("Home Session: ", session);
 
   return (
     <>

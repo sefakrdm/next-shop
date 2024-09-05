@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect, useRef } from "react";
 import { Splide, SplideSlide } from "@splidejs/react-splide";
@@ -6,52 +6,52 @@ import "@splidejs/react-splide/css";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import ImageMagnifier from "./ImageMagnifier";
+import { ProductImageTypes } from "@/utils/definitions";
+import ClientImageComponent from "../ClientImageComponent";
+
+
 
 interface ImageGalleryProps {
-    images: string[];
-    className: string;
+  images: ProductImageTypes[];
+  className?: string;
 }
 
-const ImageGallery:React.FC<ImageGalleryProps> = ({images, className}) => {
-
-    const mainRef = useRef();
-    const thumbsRef = useRef();
+const ImageGallery: React.FC<ImageGalleryProps> = ({ images, className }) => {
+  const mainRef = useRef<any>(null);
+  const thumbsRef = useRef<any>(null);
 
   const createSlider = () => {
     return images.map((slide, index) => (
       <SplideSlide key={index} className="h-full w-full">
-        <ImageMagnifier imageUrl={slide} />
+        <ImageMagnifier image={slide} />
       </SplideSlide>
     ));
   };
 
   const mainOptions = {
     type: "loop",
-    width: '100%',
-    height: '75vh',
+    width: "100%",
+    height: "75vh",
     pagination: false,
     arrows: false,
   };
 
   const thumbsOptions = {
     type: "slide",
-    //rewind: true,
     gap: "1rem",
     pagination: false,
     fixedWidth: 70,
     fixedHeight: 70,
-    height: '75vh',
+    height: "75vh",
     cover: true,
-    //focus: "center",
     isNavigation: true,
     arrows: false,
-    //releaseWheel: true,
-    direction: 'ttb',
+    direction: "ttb",
     releaseWheel: true,
   };
 
   useEffect(() => {
-    if (mainRef.current && thumbsRef.current && thumbsRef.current.splide) {
+    if (mainRef.current && thumbsRef.current) {
       mainRef.current.sync(thumbsRef.current.splide);
     }
   }, [mainRef, thumbsRef]);
@@ -62,15 +62,15 @@ const ImageGallery:React.FC<ImageGalleryProps> = ({images, className}) => {
         {images.map((slide, index) => (
           <SplideSlide
             key={index}
-            className="rounded-md border border-gray-500"
           >
-            <Image
-              src={slide}
-              alt=""
-              width={70}
-              height={70}
-              className="object-contain z-10"
-            ></Image>
+            <div className="rounded-md border border-gray-500 h-16 w-16 overflow-hidden">
+              <ClientImageComponent
+                src={slide.url}
+                alt={slide.alt}
+                fill
+                className="object-contain z-10"
+              />
+            </div>
           </SplideSlide>
         ))}
       </Splide>

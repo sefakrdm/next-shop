@@ -1,18 +1,31 @@
-import { select } from "@/lib/db"
+import { db } from "@/lib/db"
+import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = 'force-dynamic'
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
 
   try {
-    const rows: any = await select({
-      query: `SELECT * FROM categories`,
+    const searchParams = request.nextUrl.searchParams;
+    const get = searchParams.get('get');
+    const limitParam = searchParams.get('limit');
+
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+
+    const categories = await db.category.findMany({
+      where: { parentCategoryId: null },
+      include: { childCategories: true },
+      orderBy: { createdAt: "desc" },
+      take: limit,
     });
 
-    return Response.json({ status: 200, data: rows });
+    if (!categories) {
+      return NextResponse.json({ categories: null });
+    }
+
+    return NextResponse.json(categories, { status: 200 });
 
   } catch (error) {
     console.log(error);
-    return Response.json({ error: "An error occurred while fetching data." });
+    return NextResponse.json({ error: "An error occurred while fetching data." });
   }
 
 }

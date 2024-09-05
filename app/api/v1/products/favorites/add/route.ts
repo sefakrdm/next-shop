@@ -1,55 +1,62 @@
-import FavoriteModel, { IFavorite } from "@/lib/models/FavoritesModel";
-import dbConnect from "@/lib/mongodb";
-import mongoose from "mongoose";
-import { NextRequest } from "next/server";
+import { db } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const { product, userId } = await request.json(); // Gelen JSON verisini al
-
-  await dbConnect(); // MongoDB bağlantısını başlat
+  const { product, userId } = await request.json();
 
   try {
-    // Ürünün zaten kullanıcının favorilerinde olup olmadığını kontrol edin
-    const isFavorite = await FavoriteModel.findOne({
-      userId: userId,
-      "products._id": product._id,
-    }).lean();
+    const isFavorite = await db.favoriteProduct.findFirst({
+      where: {
+        favorite: {
+          userId: userId,
+        },
+        productId: product.id,
+      },
+    });
 
     if (isFavorite) {
-      return Response.json(
+      return NextResponse.json(
         { message: "Bu ürün zaten favorilere eklenmiş" },
         { status: 409 }
       );
     }
 
-    // Kullanıcının zaten bir favori girişi olup olmadığını kontrol edin
-    const userFavorites = await FavoriteModel.findOne({ userId: userId });
+    // Kullanıcının zaten bir favori listesi olup olmadığını kontrol edin
+    const userFavorites = await db.favorite.findFirst({
+      where: { userId: userId },
+    });
 
-    if (userFavorites) {
-      // Add the new product to the existing user's favorites
-      userFavorites.products.push(product);
-      await userFavorites.save();
-
-      return Response.json(
-        { message: "Ürün favorilere eklendi" },
-        { status: 201 }
-      );
+    if(userFavorites) {
+      // Mevcut favori listesine eklenecek ürün ekle
+      await db.favoriteProduct.create({
+        data: {
+          favoriteId: userFavorites.id,
+          productId: product.id,
+        }
+      });
     } else {
-      // If the user has no favorites, create a new favorites entry
-      const newFavorite: IFavorite = new FavoriteModel({
-        userId,
-        products: [product],
+      // Kullanıcının favorisi yoksa, yeni bir favori listesi oluşturun ve ürünü ekleyin
+      const newFavorite = await db.favorite.create({
+        data: {
+          userId,
+        }
       });
 
-      await newFavorite.save();
-
-      return Response.json(
-        { message: "Ürün favorilere eklendi" },
-        { status: 201 }
-      );
+      await db.favoriteProduct.create({
+        data: {
+          favoriteId: newFavorite.id,
+          productId: product.id,
+        }
+      });
     }
+
+    return NextResponse.json(
+      { message: "Ürün favorilere eklendi" },
+      { status: 201 }
+    );
+    
   } catch (error: any) {
-    return Response.json(
+    return NextResponse.json(
       {
         message: `Favorilere eklenirken bir hata oluştu. HATA: ${error.message}`,
       },

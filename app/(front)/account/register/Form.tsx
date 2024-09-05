@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { register as registerUser } from "@/lib/actions/register";
 import { cn } from "@/lib/utils";
 import { CircleNotch, Warning } from "@phosphor-icons/react/dist/ssr";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 type Inputs = {
@@ -50,42 +51,20 @@ const Form = () => {
         }
     }, [callbackUrl, params, router, session]);
 
-    const [errorMess, setErrorMess] = useState<string>("");
 
-    const formSubmit: SubmitHandler<Inputs> = async (form) => {
-        const { name, surname, email, password } = form;
+    const [isPending, startTransition] = useTransition();
+    const [error, setError] = useState("");
 
-        try {
-            const res = await fetch('/api/v1/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name,
-                    surname,
-                    email,
-                    password
-                }),
-            });
-
-            if(res.ok) {
-                return router.push(
-                    `/account/login?callbackUrl=${callbackUrl}&success=Hesabınız oluşturuldu`
-                )
-            } else {
-                const data = await res.json();
-                throw new Error(data.message);
-            }
-
-        } catch (err: any) {
-          setErrorMess(
-            err.message && err.message.indexOf("E11000") === 0
-              ? "Bu e-posta adresi ile daha önce kayıt olunmuş. Lütfen farklı bir e-posta adresi giriniz."
-              : err.message
-          );
-          console.log(err || "error");
-        }
+    const formSubmit: SubmitHandler<Inputs> = async (values) => {
+      startTransition(async () => {
+        const data = await registerUser(values, callbackUrl);
+        if(data && data.success) {
+          return router.push(
+            `/account/login?callbackUrl=${callbackUrl}&success=Hesabınız oluşturuldu`
+          )
+        };
+        if(data && data.error) setError(data.error);
+      });
     }
 
     return (
@@ -93,12 +72,12 @@ const Form = () => {
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-4xl font-extrabold mb-10">Kayıt Ol</h1>
           <div className="realative w-[450px] bg-white drop-shadow-md p-10 rounded-xl">
-            {errorMess && (
+            {error && (
               <Alert className="mb-5" variant="destructive">
                 <Warning weight="bold" className="h-4 w-4" />
                 <AlertTitle>Kayıt Başarısız.</AlertTitle>
                 <AlertDescription>
-                    {errorMess}
+                    {error}
                 </AlertDescription>
               </Alert>
             )}
@@ -119,6 +98,7 @@ const Form = () => {
                       "border rounded-md h-12 p-4",
                       errors.name && "border-red-500"
                     )}
+                    disabled={isSubmitting}
                   />
                   {errors.name?.message && (
                     <div className="text-xs text-red-500">
@@ -140,6 +120,7 @@ const Form = () => {
                       "border rounded-md h-12 p-4",
                       errors.surname && "border-red-500"
                     )}
+                    disabled={isSubmitting}
                   />
                   {errors.surname?.message && (
                     <div className="text-xs text-red-500">
@@ -166,6 +147,7 @@ const Form = () => {
                     "border rounded-md h-12 p-4",
                     errors.email && "border-red-500"
                   )}
+                  disabled={isSubmitting}
                 />
                 {errors.email?.message && (
                   <div className="text-xs text-red-500">
@@ -184,6 +166,7 @@ const Form = () => {
                     required: "Şifre boş olamaz",
                   })}
                   className={cn("border rounded-md h-12 p-4 font-['math'] tracking-[.25em]", errors.password && "border-red-500")}
+                  disabled={isSubmitting}
                 />
                 {errors.password?.message && (
                   <div className="text-xs text-red-500">
@@ -209,6 +192,7 @@ const Form = () => {
                     },
                   })}
                   className={cn("border rounded-md h-12 p-4 font-['math'] tracking-[.25em]", errors.confirmPassword && "border-red-500")}
+                  disabled={isSubmitting}
                 />
                 {errors.confirmPassword?.message && (
                   <div className="text-xs text-red-500">

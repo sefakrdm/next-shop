@@ -1,28 +1,16 @@
+import { ProductTypes } from "@/utils/definitions";
 import { cache } from "react";
-import dbConnect from "../mongodb";
-import ProductModel, { IProduct } from "@/lib/models/ProductModel";
-import mongoose from "mongoose";
+import { db } from "../db";
 
 export const revalidate = 3600; //! verileri en fazla saatte bir yeniden doğrulayın
 
-const getLatest = cache(async (limit: number | null): Promise<IProduct[] | null> => {
-  await dbConnect();
-  const products = await ProductModel.aggregate([
-    {
-      $sort: { createdAt: -1 },
-    },
-    {
-      $lookup: {
-        from: 'categories',
-        localField: 'category_id',
-        foreignField: '_id',
-        as: 'category',
-      },
-    },
-    {
-      $limit: limit || 10,
-    },
-  ]).exec();
+const getLatest = cache(async (limit: number | null): Promise<ProductTypes[] | null> => {
+
+  const products = await db.product.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { category: true, ProductImages: true },
+    take: limit || 10,
+  });
 
   if (!products || products.length === 0) {
     return null;
@@ -31,24 +19,14 @@ const getLatest = cache(async (limit: number | null): Promise<IProduct[] | null>
   }
 });
 
-const getFeatured = cache(async (limit: number | null): Promise<IProduct[] | null> => {
-  await dbConnect();
-  const products = await ProductModel.aggregate([
-    {
-      $match: { isFeatured: true },
-    },
-    {
-      $lookup: {
-        from: 'categories',
-        localField: 'categoryId',
-        foreignField: '_id',
-        as: 'category',
-      },
-    },
-    {
-      $limit: limit || 10,
-    },
-  ]).exec();
+const getFeatured = cache(async (limit: number | null): Promise<ProductTypes[] | null> => {
+
+  const products = await db.product.findMany({
+    where: { isFeatured: true },
+    include: { category: true, ProductImages: true },
+    orderBy: { createdAt: "desc" },
+    take: limit || 10,
+  });
 
   if (!products || products.length === 0) {
     return null;
@@ -57,43 +35,30 @@ const getFeatured = cache(async (limit: number | null): Promise<IProduct[] | nul
   }
 });
 
-const getBySlug = cache(async (slug: string): Promise<IProduct | null> => {
-    await dbConnect();
-    const product = await ProductModel.aggregate([
-      { $match: { slug } },
-      {
-        $lookup: {
-          from: 'categories',
-          localField: 'categoryId',
-          foreignField: '_id',
-          as: 'category',
-        },
-      },
-      { $limit: 1 },
-    ]).exec();
+const getBySlug = cache(async (slug: string): Promise<ProductTypes | null> => {
 
-    if(!product || product.length === 0) {
+    const product = await db.product.findFirst({
+      where: { slug: slug },
+      include: { category: true, ProductImages: true, Review: true },
+      orderBy: { createdAt: "desc" },
+      take: 1,
+    });
+
+    if(!product) {
       return null
     } else {
-      return JSON.parse(JSON.stringify(product[0]));
+      return JSON.parse(JSON.stringify(product));
     }
 });
 
-const getByCategoryId = cache(async (categoryId: string, limit: number | null): Promise<IProduct[] | null> => {
-  await dbConnect();
-  const objectId = new mongoose.Types.ObjectId(categoryId);
-  const products = await ProductModel.aggregate([
-    { $match: { categoryId: objectId } },
-    {
-      $lookup: {
-        from: 'categories',
-        localField: 'categoryId',
-        foreignField: '_id',
-        as: 'category',
-      },
-    },
-    { $limit: limit || 10 },
-  ]).exec();
+const getByCategoryId = cache(async (categoryId: string, limit: number | null): Promise<ProductTypes[] | null> => {
+
+  const products = await db.product.findMany({
+    where: { categoryId: categoryId },
+    include: { category: true, ProductImages: true },
+    orderBy: { createdAt: "desc" },
+    take: limit || 10,
+  });
 
   if(!products || products.length === 0) {
     return null

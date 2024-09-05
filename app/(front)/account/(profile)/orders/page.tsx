@@ -179,14 +179,6 @@ const OrdersPage = () => {
             >
               <AccordionTrigger
                 className="py-2.5 px-5"
-                onClick={() => {
-                  const element = document.getElementById(
-                    `content-${order.id}`
-                  );
-                  element?.scrollIntoView({
-                    behavior: "smooth",
-                  });
-                }}
               >
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center space-x-5">

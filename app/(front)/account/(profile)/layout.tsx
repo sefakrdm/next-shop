@@ -9,7 +9,7 @@ const AccountLayout = ({children}: { children: React.ReactNode }) => {
           <div className="w-3/12">
             <AccountSidebar />
           </div>
-          <div className="w-9/12 bg-white drop-shadow-md rounded-lg p-5">
+          <div className="w-9/12 bg-white drop-shadow-md rounded-lg px-10 py-5">
             {children}
           </div>
         </div>

@@ -1,32 +1,37 @@
-import FavoriteModel, { IFavorite } from "@/lib/models/FavoritesModel";
-import dbConnect from "@/lib/mongodb";
-import { NextRequest } from "next/server";
+import { db } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
-  const { userId } = await request.json(); // Gelen JSON verisini al
-
-  await dbConnect(); // MongoDB bağlantısını başlat
+export async function GET(request: NextRequest) {
+  // const { userId } = await request.json(); // Gelen JSON verisini al
 
   try {
-    // Ürünün zaten kullanıcının favorilerinde olup olmadığını kontrol edin
-    const favorites = await FavoriteModel.findOne({
-      userId: userId
-    }).lean().exec();
+    // Ürünün kullanıcının favorilerinde olup olmadığını kontrol edin
+    const favorites = await db.favoriteProduct.findMany({
+      where: {
+        favorite: {
+          userId: "66d85564f7ddaea39511105c",
+        },
+      },
+      include: {
+        product: true,
+      },
+    });
 
-    if (!favorites || favorites.length === 0) {
-      return Response.json(
-        { message: "Veri bulunamadı", data: null },
+    if (Array(favorites) && favorites.length === 0) {
+      return NextResponse.json(
+        { favorites: null, message: "Veri bulunamadı" },
         { status: 204 }
       );
     } else {
-      return Response.json(
-        { message: "OK", data: favorites },
+      const products = favorites.map(fp => fp.product);
+      return NextResponse.json(
+        { products },
         { status: 201 }
       );
       // return addresses
     }
   } catch (e) {
-    return Response.json(
+    return NextResponse.json(
       { message: "Veriler getirilirken bir hata oluştu" },
       { status: 500 }
     );

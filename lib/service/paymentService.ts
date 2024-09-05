@@ -1,12 +1,14 @@
 import { cache } from "react";
-import dbConnect from "../mongodb";
-import PaymentModel, { IPayment } from "../models/PaymentModel";
+import { PaymentTypes } from "@/utils/definitions";
+import { db } from "../db";
 
 export const revalidate = 3600; //! verileri en fazla saatte bir yeniden doğrulayın
 
-const getAll = cache(async (): Promise<IPayment[] | null> => {
-  await dbConnect();
-  const payments = await PaymentModel.find({ status: true }).lean().exec();
+const getAll = cache(async (): Promise<PaymentTypes[] | null> => {
+
+  const payments = await db.payment.findMany({
+    orderBy: { createdAt: "desc" },
+  });
 
   if (!payments || payments.length === 0) {
     return null;

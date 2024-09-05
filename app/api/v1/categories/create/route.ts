@@ -1,27 +1,43 @@
-import Category, { ICategory } from "@/lib/models/CategoryModel";
-import dbConnect from "@/lib/mongodb";
-import { slugify } from "@/lib/utils";
-import { NextRequest } from "next/server";
+import { db } from "@/lib/db";
+import { slugFn } from "@/lib/utils";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
-  const { title, description, parentCategory } = await request.json(); // Gelen JSON verisini al
-
-  await dbConnect(); // MongoDB bağlantısını başlat
-
-  const slug = slugify(title);
-
-  const newCategory: ICategory = new Category({
-    title,
-    description,
-    slug,
-    parentCategory,
-  });
+export async function POST(req: NextRequest) {
 
   try {
-    await newCategory.save();
 
-    return Response.json({ message: 'Kategori oluşturuldu' }, { status: 201 });
+    const {
+      title,
+      description,
+      shortDescription,
+      parentCategoryId,
+      translations,
+      images,
+      isActive,
+    } = await req.json();
+
+    const slug = slugFn(title);
+
+    const category = await db.category.create({
+      data: {
+        title,
+        slug,
+        description,
+        shortDescription,
+        parentCategoryId,
+        translations,
+        images,
+        isActive,
+      }
+    });
+
+    return NextResponse.json(category, { status: 201 });
   } catch (error: any) {
-    return Response.json({ message: `Kategori oluşturulurken bir hata oluştu. HATA: ${error.message}` }, { status: 500 });
+    return NextResponse.json(
+      {
+        message: `Kategori oluşturulurken bir hata oluştu. HATA: ${error.message}`,
+      },
+      { status: 500 }
+    );
   }
 }

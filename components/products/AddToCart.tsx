@@ -2,12 +2,12 @@
 
 import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { IOrderItem } from "@/lib/models/OrderModel";
 import useCartService from "@/lib/hooks/useCartStore";
 import { Button } from "../ui/button";
 import { CircleNotch, Minus, Plus } from "@phosphor-icons/react/dist/ssr";
+import { OrderItemTypes, ProductTypes } from "@/utils/definitions";
 
-export default function AddToCart({ item }: { item: IOrderItem }) {
+export default function AddToCart({ item }: { item: ProductTypes }) {
   const router = useRouter();
   const { items, addCart, increase, decrease } = useCartService();
   const [loading, setLoading] = useState<boolean>(false);
@@ -34,7 +34,7 @@ export default function AddToCart({ item }: { item: IOrderItem }) {
   const addToCartHandler = () => {
     setLoading(true);
     setTimeout(() => {
-      addCart({ ...item, qty: productQty, variants: [] });
+       //addCart({ ...item, qty: productQty, variants: [] } as OrderItemTypes);
     }, 1000);
     setTimeout(() => {
       setLoading(false);

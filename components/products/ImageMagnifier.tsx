@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { ProductImageTypes } from '@/utils/definitions';
 
 const MAGNIFIER_SIZE = 140;
 const ZOOM_LEVEL = 1.5;
 
-const ImageMagnifier: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
+const ImageMagnifier: React.FC<{ image: ProductImageTypes }> = ({ image }) => {
 
     // const [position, setPosition] = useState<{x: number, y: number}>({ x: 0, y: 0 });
     // const [showMagnifier, setShowMagnifier] = useState<boolean>(false);
@@ -73,8 +74,8 @@ const ImageMagnifier: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
         className="w-full h-full relative overflow-hidden"
       >
         <Image
-          src={imageUrl}
-          alt=""
+          src={image.url}
+          alt={image.alt}
           fill
           className="object-contain z-10"
           style={{}}
@@ -83,7 +84,7 @@ const ImageMagnifier: React.FC<{ imageUrl: string }> = ({ imageUrl }) => {
         <div
           style={{
             backgroundPosition: `${position.x}px ${position.y}px`,
-            backgroundImage: `url(${imageUrl})`,
+            backgroundImage: `url(${image.url})`,
             backgroundSize: `${imageSize.width * ZOOM_LEVEL}px ${
               imageSize.height * ZOOM_LEVEL
             }px`,

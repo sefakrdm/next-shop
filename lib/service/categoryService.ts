@@ -1,46 +1,53 @@
+import { CategoryTypes } from "@/utils/definitions";
 import { cache } from "react";
-import dbConnect from "../mongodb";
-import CategoryModel, { ICategory } from "../models/CategoryModel";
+import { db } from "../db";
 
 export const revalidate = 3600; //! verileri en fazla saatte bir yeniden doğrulayın
 
-const getLatest = cache(async (limit: number | null): Promise<ICategory[] | null> => {
-  await dbConnect();
-  const categories = await CategoryModel.find().limit(limit || 10).exec();
+const getLatest = cache(async (limit: number | null): Promise<CategoryTypes[] | null> => {
+
+  const categories = await db.category.findMany({
+    where: { parentCategoryId: null },
+    include: { childCategories: true },
+    orderBy: { createdAt: "desc" },
+    take: limit || 10,
+  });
 
   if (!categories || categories.length === 0) {
     return null;
   } else {
-    return JSON.parse(JSON.stringify(categories));
+    return categories as unknown as CategoryTypes[];
   }
 });
 
-const getChildCategories = cache(
-  async (categoryId: string): Promise<ICategory[] | null> => {
-    await dbConnect();
-    const categories = await CategoryModel.find({
-      parentCategory: categoryId,
-    }).exec();
+const getChildCategories = cache(async (categoryId: string): Promise<CategoryTypes[] | null> => {
 
-    if (!categories || categories.length === 0) {
-      return null;
-    } else {
-      return categories;
-    }
+  const categories = await db.category.findMany({
+    where: { parentCategoryId: categoryId },
+    include: { childCategories: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if(!categories || categories.length === 0) {
+    return null
+  } else {
+    return categories as unknown as CategoryTypes[];
   }
-);
+});
 
-const getBySlug = cache(async (slug: string): Promise<ICategory | null> => {
-    await dbConnect();
-    const category = await CategoryModel.aggregate([
-      { $match: { slug } },
-      { $limit: 1 },
-    ]).exec();
+const getBySlug = cache(async (slug: string): Promise<CategoryTypes | null> => {
 
-    if(!category || category.length === 0) {
+    const category = await db.category.findFirst({
+      where: { slug: slug },
+      include: { childCategories: true },
+      orderBy: { createdAt: "desc" },
+      take: 1,
+    });
+
+    if(!category) {
       return null
     } else {
-      return JSON.parse(JSON.stringify(category[0]));
+      return category as unknown as CategoryTypes;
     }
 });
 

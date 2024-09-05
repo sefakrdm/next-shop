@@ -1,12 +1,15 @@
+import { ShippingTypes } from "@/utils/definitions";
 import { cache } from "react";
-import dbConnect from "../mongodb";
-import ShippingsModel, { IShipping } from "../models/ShippingModel";
+import { db } from "../db";
 
 export const revalidate = 3600; //! verileri en fazla saatte bir yeniden doğrulayın
 
-const getAll = cache(async (): Promise<IShipping[] | null> => {
-  await dbConnect();
-  const shippings = await ShippingsModel.find({ status: true }).lean().exec();
+const getAll = cache(async (): Promise<ShippingTypes[] | null> => {
+
+  const shippings = await db.shipping.findMany({
+    where: { status: true },
+    orderBy: { createdAt: "desc" },
+  });
 
   if (!shippings || shippings.length === 0) {
     return null;

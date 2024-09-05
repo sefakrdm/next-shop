@@ -47,8 +47,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = async ({ slug }) => {
               <div className="bg-white rounded-xl shadow p-5 space-y-2.5">
                 <h2 className="text-xl font-semibold">Alt Kategoriler</h2>
                 <div className="flex flex-col space-y-0.5 max-h-72 overflow-y-auto">
-                  {categories &&
-                    categories.length > 0 &&
+                  {Array.isArray(categories) && categories.length > 0 &&
                     categories.map((cat, index) => (
                       <Link key={index} href={`/${cat.slug}`}>
                         {cat.title}
@@ -76,7 +75,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = async ({ slug }) => {
                         discountPercentage={
                           prod.discountPercentage || undefined
                         }
-                        stock={prod.stock}
+                        stock={prod.stock || 0}
                         images={prod.images || []}
                         isNewProduct={prod.isNewProduct}
                         isFreeShipping={prod.isFreeShipping}

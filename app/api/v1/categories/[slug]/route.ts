@@ -1,17 +1,27 @@
-import { select } from "@/lib/db"
+import { db } from "@/lib/db";
+import { NextRequest } from "next/server";
 
-export const dynamic = 'force-dynamic'
-export async function GET(request: Request, { params }: { params: { slug: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
 
   try {
-    const rows: any = await select({
-      query: `SELECT * FROM categories WHERE slug = '${params.slug}'`,
-    });
 
-    if(rows.length > 0) {
-      return Response.json({ status: 200, data: rows[0] });
+    const searchParams = request.nextUrl.searchParams;
+    const get = searchParams.get('get');
+    const limitParam = searchParams.get('limit');
+
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+
+    const category = await db.category.findMany({
+      where: { slug: params.slug },
+      include: { childCategories: true },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    })
+
+    if(category.length > 0) {
+      return Response.json({ category: null });
     } else {
-      return Response.json({ status: 200, data: null });
+      return Response.json({ category }, { status: 200 });
     }
 
   } catch (error) {

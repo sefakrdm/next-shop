@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Rating as ReactRating, RoundedStar } from '@smastrom/react-rating';
 import {
   Breadcrumb,
@@ -17,16 +17,15 @@ import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Carousel, CarouselContent, CarouselItem } from "../ui/carousel";
 import ProductItem from "../products/ProductItem";
-import { IProduct } from "@/lib/models/ProductModel";
-import { Document, Model, Types, UpdateQuery, MergeType, Query, FlattenMaps, Require_id, UpdateWithAggregationPipeline, Error } from "mongoose";
 import AddToCart from "../products/AddToCart";
-import ImageMagnifier from "../products/ImageMagnifier";
 import ImageGallery from "../products/ImageGallery";
 import ProductReviews from "../products/ProductReviews";
 import reviewService from "@/lib/service/reviewService";
 import axios from "axios";
 import { ProductTypes } from "@/utils/definitions";
 import AddFavoriteButton from "./AddFavoriteButton";
+import { auth } from "@/lib/auth";
+import favoriteService from "@/lib/service/favoriteService";
 
 const ProductDetail = async ({ slug }: { slug: string }) => {
   // const [product, setProduct] = useState<ProductTypes>();
@@ -47,13 +46,18 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
   //   getProduct();
   // }, [slug]);
 
+  const session = await auth();
+
+  
   const product = await productService.getBySlug(slug);
   const relatedProduct = await productService.getByCategoryId(product?.categoryId || '', 10);
-  const reviews = await reviewService.getByProductId(product?._id || '', 10);
+  // const reviews = await reviewService.getByProductId(product?.id || '', 10);
+  
+  const isFavorite = await favoriteService.getByUserProductId(product?.id || '', session?.user.id || '');
 
   // Ortalama puanı hesapla
-  const totalReviews = reviews?.length ?? 0;
-  const totalRating = reviews?.reduce((sum, review) => sum + review.rate, 0) ?? 0;
+  const totalReviews = product?.Review?.length ?? 0;
+  const totalRating = product?.Review?.reduce((sum, review) => sum + review.rate, 0) ?? 0;
   const averageRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(2) : "0.00";
 
   return (
@@ -67,8 +71,8 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href={`/category/${product?.category[0].slug}`}>
-                  {product?.category[0].title}
+                <BreadcrumbLink href={`/category/${product?.category.slug}`}>
+                  {product?.category.title}
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
@@ -84,7 +88,7 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
         <div className="container">
           <div className="flex items-stretch">
             <div className="w-1/2">
-              {product?.images && product?.images.length != 0 && (
+              {product?.ProductImages && product?.ProductImages.length != 0 && (
                 // <Image
                 //   src={product?.images[0]}
                 //   fill
@@ -92,7 +96,7 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
                 //   className="object-contain"
                 // />
                 <ImageGallery
-                  images={JSON.parse(JSON.stringify(product.images))}
+                  images={JSON.parse(JSON.stringify(product.ProductImages))}
                   className="flex items-start justify-start"
                 />
               )}
@@ -127,39 +131,40 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
                     href="#"
                     className="text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    {`${reviews?.length ?? "0"} Değerlendirme`}
+                    {`${product?.Review?.length ?? "0"} Değerlendirme`}
                   </a>
                 </div>
               </div>
               <div className="flex flex-col mb-1">
                 <span className="text-3xl font-bold text-slate-800">
-                  {product?.currency &&
+                  {product?.price?.currency &&
                     product?.price &&
                     priceFormat(
-                      product?.currency,
-                      "TRY",
+                      product?.price?.currency,
+                      product?.price?.currency,
                       "tr-TR",
-                      product?.price
+                      product?.price?.sellPrice || 0
                     )}
                 </span>
                 <span className="text-base font-bold text-slate-600">
                   -{" "}
-                  {product?.currency &&
+                  {product?.price?.currency &&
                     product?.price &&
                     priceFormat(
-                      product?.currency,
+                      product?.price?.currency,
                       "USD",
                       "tr-TR",
-                      product?.price
+                      product?.price?.sellPrice || 0
                     )}
                 </span>
               </div>
               <p className="text-sm text-gray-600">Fiyatlara KDV Dahildir</p>
               <p className="mt-10">{product?.shortDescription}</p>
-              <div className="flex items-center space-x-5 mt-10">
+              <div className="flex items-center justify-between space-x-3.5 mt-10">
                 {product && (
                   <AddToCart item={product} />
                 )}
+                <AddFavoriteButton product={product ?? null} isFavorite={isFavorite} />
               </div>
               <div className="flex items-center space-x-5 mt-5">
                 <Button
@@ -169,14 +174,13 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
                   <Shuffle size={16} weight="bold" />
                   <span>Karşılaştır</span>
                 </Button>
-                <AddFavoriteButton product={product ?? null} />
               </div>
               <div className="shrink-0 border h-[1px] w-full my-5"></div>
               <div className="flex flex-col space-y-1 text-sm">
                 <div>
                   <strong>Kategori:</strong>{" "}
-                  <Link href={`/category/${product?.category[0].slug}`}>
-                    {product?.category[0].title}
+                  <Link href={`/category/${product?.category.slug}`}>
+                    {product?.category.title}
                   </Link>
                 </div>
                 <div>
@@ -208,7 +212,7 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
                 className="text-base font-semibold py-2 rounded-lg px-6"
                 value="reviews_tab"
               >
-                Değerlendirmeler ({reviews?.length ?? "0"})
+                Değerlendirmeler ({product?.Review?.length ?? "0"})
               </TabsTrigger>
             </TabsList>
             <TabsContent
@@ -228,7 +232,7 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
               value="reviews_tab"
             >
               <ProductReviews
-                reviews={reviews ? reviews : []}
+                reviews={product?.Review ? product?.Review : []}
               />
             </TabsContent>
           </Tabs>
@@ -247,17 +251,7 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
                     (lProd: any, index: any) => (
                       <CarouselItem className="basis-1/5 pb-5" key={index}>
                         <ProductItem
-                          id={lProd._id}
-                          title={lProd.title}
-                          price={lProd.price}
-                          slug={lProd.slug}
-                          discountPercentage={
-                            lProd.discountPercentage || undefined
-                          }
-                          stock={lProd.stock}
-                          images={lProd.images || []}
-                          isNewProduct={lProd.isNewProduct}
-                          isFreeShipping={lProd.isFreeShipping}
+                          product={lProd}
                         />
                       </CarouselItem>
                     )

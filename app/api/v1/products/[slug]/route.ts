@@ -1,48 +1,33 @@
-import { select } from "@/lib/db"
+import { db } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export const dynamic = 'force-dynamic' // defaults to auto
 export async function GET(request: Request, { params }: { params: { slug: string } }) {
 
   try {
-    const rows: any = await select({
-      query: `
-        SELECT 
-            p.id, 
-            p.title, 
-            p.short_description, 
-            p.description, 
-            p.price, 
-            p.discount_percentage, 
-            p.slug, 
-            CONCAT(GROUP_CONCAT(DISTINCT JSON_OBJECT('id', c.id, 'title', c.title, 'slug', c.slug))) AS category, 
-            CONCAT('[', GROUP_CONCAT('"', pi.image_url, '"'), ']') AS images 
-        FROM 
-            products p 
-        JOIN 
-            product_images pi ON p.id = pi.product_id 
-        JOIN 
-            categories c ON p.category_id = c.id 
-        WHERE 
-            p.slug = '${params.slug}'
-        GROUP BY 
-            p.id, p.title, p.description
-      `,
+    const product = await db.product.findMany({
+      where: { slug: params.slug },
+      include: {
+        category: true,
+        ProductImages: true,
+        favorites: {
+          include: {
+            favorite: true
+          }
+        }
+      },
+      orderBy: { createdAt: "desc" },
     });
 
-    rows.forEach((row: any) => {
-      row.category = JSON.parse(row.category);
-      row.images = JSON.parse(row.images);
-    });
-
-    if(rows.length > 0) {
-      return Response.json({ status: 200, data: rows[0] });
-    } else {
-      return Response.json({ status: 200, data: null });
+    if(!product || product.length === 0) {
+      return NextResponse.json({ product: null });
     }
+
+    return NextResponse.json({ product }, { status: 200 });
 
   } catch (error) {
     console.log(error);
-    return Response.json({ error: "An error occurred while fetching data." });
+    return NextResponse.json({ error: "An error occurred while fetching data." });
   }
 
 }

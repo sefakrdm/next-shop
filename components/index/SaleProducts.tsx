@@ -26,15 +26,7 @@ const SaleProducts:React.FC = async () => {
         products.map((prod, index) => (
           <ProductItem
             key={index}
-            id={prod._id}
-            title={prod.title}
-            price={prod.price}
-            slug={prod.slug}
-            discountPercentage={prod.discountPercentage || undefined}
-            stock={prod.stock}
-            images={prod.images || []}
-            isNewProduct={prod.isNewProduct}
-            isFreeShipping={prod.isFreeShipping}
+            product={prod}
           />
         ))}
     </>

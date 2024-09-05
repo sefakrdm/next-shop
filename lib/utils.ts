@@ -1,5 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge";
+import slugify from "slugify";
+import bcrypt from "bcryptjs";
 
 interface ConversionRates {
   [key: string]: { [key: string]: number };
@@ -41,11 +43,13 @@ export function formattedPrice(locale: string, toCurrency: string, price: number
     .replace(/^(\D+)/, "$1 ");
 }
 
-export function slugify(str: string) {
-  return str
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+export function slugFn(str: string) {
+  return slugify(str, { replacement: '-', lower: true, strict: true });
+}
+
+export function saltAndHashPassword(password: any) {
+  const saltRounds = 10; // Adjust the cost factor according to your security requirements
+  const salt = bcrypt.genSaltSync(saltRounds); // Synchronously generate a salt
+  const hash = bcrypt.hashSync(password, salt); // Synchronously hash the password
+  return hash; // Return the hash directly as a string
 }
