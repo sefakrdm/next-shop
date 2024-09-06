@@ -1,7 +1,11 @@
 import { Metadata } from 'next';
 import React from 'react';
 import { Separator } from '@/components/ui/separator';
-import Form from './Form';
+import dynamic from 'next/dynamic';
+
+const Form = dynamic(() => import('./Form').then((mod) => mod.default), {
+  loading: () => <div>Yükleniyor...</div>,
+});
 
 export const metadata: Metadata = {
   title: "Hesabım"

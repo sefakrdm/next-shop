@@ -2,22 +2,42 @@
 
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
-import ProductItem from "../products/ProductItem";
 import axios from "axios";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Skeleton } from "../ui/skeleton";
 import { Input } from "../ui/input";
 import { FavoriteTypes } from "@/utils/definitions";
+import dynamic from "next/dynamic";
+
+const ProductItem = dynamic(
+  () => import("../products/ProductItem").then((mod) => mod.ProductItem),
+  {
+    loading: () => (
+      <>
+        {[...Array(8)].map((_, index) => (
+          <Skeleton key={index} className="w-[220px] h-[360px] rounded-xl" />
+        ))}
+      </>
+    ),
+    ssr: false,
+  }
+);
 
 interface AccountFavoritesClientProps {
   favorites: FavoriteTypes[];
 }
-const AccountFavoritesClient:React.FC<AccountFavoritesClientProps> = ({ favorites }) => {
+const AccountFavoritesClient: React.FC<AccountFavoritesClientProps> = ({
+  favorites,
+}) => {
   const { data: session } = useSession();
 
-  const [favoriteProducts, setFavoriteProducts] = useState<any[] | null>(favorites);
-  const [filteredProducts, setFilteredProducts] = useState<any[] | null>(favorites);
+  const [favoriteProducts, setFavoriteProducts] = useState<any[] | null>(
+    favorites
+  );
+  const [filteredProducts, setFilteredProducts] = useState<any[] | null>(
+    favorites
+  );
   const [searchValue, setSearchValue] = useState<string>("");
 
   useEffect(() => {
@@ -34,7 +54,7 @@ const AccountFavoritesClient:React.FC<AccountFavoritesClientProps> = ({ favorite
   const handleRemoveFavorite = async (id: string) => {
     await axios
       .delete(`/api/v1/products/favorites/remove`, {
-        data: { userId: session?.user.id, productId: id }
+        data: { userId: session?.user.id, productId: id },
       })
       .then((response) => {
         if (

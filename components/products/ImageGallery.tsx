@@ -16,7 +16,7 @@ interface ImageGalleryProps {
   className?: string;
 }
 
-const ImageGallery: React.FC<ImageGalleryProps> = ({ images, className }) => {
+export const ImageGallery: React.FC<ImageGalleryProps> = ({ images, className }) => {
   const mainRef = useRef<any>(null);
   const thumbsRef = useRef<any>(null);
 
@@ -62,13 +62,14 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, className }) => {
         {images.map((slide, index) => (
           <SplideSlide
             key={index}
+            className="!rounded-md !border-2 [&.is-active]:!border-primary/70 !border-gray-300 !overflow-hidden !relative h-16 w-16 transition-all duration-200 ease-in-out !object-contain !bg-size-contain !bg-center"
           >
-            <div className="rounded-md border border-gray-500 h-16 w-16 overflow-hidden">
+            <div>
               <ClientImageComponent
                 src={slide.url}
                 alt={slide.alt}
                 fill
-                className="object-contain z-10"
+                className="object-contain"
               />
             </div>
           </SplideSlide>
@@ -86,5 +87,3 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, className }) => {
     </div>
   );
 };
-
-export default ImageGallery;

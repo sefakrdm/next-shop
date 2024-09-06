@@ -89,6 +89,10 @@ export type OrderItemTypes = {
   discount: number;
   createdAt: Date;
   updatedAt: Date;
+  slug: string;
+  images: string[];
+  title: string;
+  currency: string;
 }
 
 export type AddressTypes = {

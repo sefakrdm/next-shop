@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Minus, Plus, Trash } from "@phosphor-icons/react/dist/ssr";
 import { priceFormat } from "@/lib/utils";
-import { IOrderItem } from "@/lib/models/OrderModel";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { OrderItemTypes } from "@/utils/definitions";
 
 export default function CartDetails() {
     const router = useRouter();
@@ -19,7 +19,7 @@ export default function CartDetails() {
         setMounted(true);
     }, []);
 
-    const removeFromCartHandler = (item: IOrderItem) => {
+    const removeFromCartHandler = (item: OrderItemTypes) => {
       removeCart(item);
     }
 

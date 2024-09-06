@@ -24,7 +24,6 @@ import Link from "next/link";
 import Image from "next/image";
 import useCartService from "@/lib/hooks/useCartStore";
 import { priceFormat } from "@/lib/utils";
-import { IOrderItem } from "@/lib/models/OrderModel";
 import { useRouter } from "next/navigation";
 
 const BasketSheet: React.FC = () => {

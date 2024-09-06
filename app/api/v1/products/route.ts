@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { JsonValue } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
 import { type NextRequest } from 'next/server';
 

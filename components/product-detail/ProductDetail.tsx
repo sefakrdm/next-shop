@@ -10,22 +10,30 @@ import {
 } from "../ui/breadcrumb";
 import productService from "@/lib/service/productService";
 import { priceFormat } from "@/lib/utils";
-import { Heart, Minus, Plus, Shuffle, Star } from "@phosphor-icons/react/dist/ssr";
+import { Shuffle } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import Image from "next/image";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Carousel, CarouselContent, CarouselItem } from "../ui/carousel";
-import ProductItem from "../products/ProductItem";
-import AddToCart from "../products/AddToCart";
-import ImageGallery from "../products/ImageGallery";
-import ProductReviews from "../products/ProductReviews";
-import reviewService from "@/lib/service/reviewService";
-import axios from "axios";
-import { ProductTypes } from "@/utils/definitions";
 import AddFavoriteButton from "./AddFavoriteButton";
 import { auth } from "@/lib/auth";
 import favoriteService from "@/lib/service/favoriteService";
+import dynamic from "next/dynamic";
+
+const LazyProductItem = dynamic(() => import("../products/ProductItem").then((mod) => mod.ProductItem), {
+  loading: () => <div>Yükleniyor...</div>,
+  ssr: false,
+});
+const AddToCart = dynamic(() => import("../products/AddToCart").then((mod) => mod.AddToCart), {
+  loading: () => <div>Yükleniyor...</div>,
+});
+const ImageGallery = dynamic(() => import("../products/ImageGallery").then((mod) => mod.ImageGallery), {
+  loading: () => <div>Yükleniyor...</div>,
+});
+const ProductReviews = dynamic(() => import("../products/ProductReviews").then((mod) => mod.ProductReviews), {
+  loading: () => <div>Yükleniyor...</div>,
+  ssr: false,
+});
 
 const ProductDetail = async ({ slug }: { slug: string }) => {
   // const [product, setProduct] = useState<ProductTypes>();
@@ -250,7 +258,7 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
                   JSON.parse(JSON.stringify(relatedProduct)).map(
                     (lProd: any, index: any) => (
                       <CarouselItem className="basis-1/5 pb-5" key={index}>
-                        <ProductItem
+                        <LazyProductItem
                           product={lProd}
                         />
                       </CarouselItem>

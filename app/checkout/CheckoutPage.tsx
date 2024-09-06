@@ -8,19 +8,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import useCartService from '@/lib/hooks/useCartStore';
-import { IAddress } from '@/lib/models/AddressModel'
-import { IPayment } from '@/lib/models/PaymentModel';
-import { IShipping } from '@/lib/models/ShippingModel';
 import { cn, priceFormat } from '@/lib/utils';
+import { AddressTypes, PaymentTypes, ShippingTypes } from '@/utils/definitions';
 import { LockKey, PencilSimpleLine, Trash } from '@phosphor-icons/react/dist/ssr';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 
 interface CheckoutProps {
-    addresses: IAddress[];
-    shippings: IShipping[];
-    payments: IPayment[];
+    addresses: AddressTypes[];
+    shippings: ShippingTypes[];
+    payments: PaymentTypes[];
 }
 
 interface ProvinceProps {

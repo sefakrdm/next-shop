@@ -1,16 +1,28 @@
-"use client"
+"use client";
 
-import React from 'react'
-import Image from 'next/image'
-import { cn } from '@/lib/utils'
- 
-const ClientImageComponent = ({ src, alt, width, height, fill, className }: {
-    src: string
-    alt: string
-    width?: number
-    height?: number
-    fill?: boolean
-    className?: string
+import React from "react";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+
+const ClientImageComponent = ({
+  src,
+  alt,
+  width,
+  height,
+  fill,
+  className,
+  style,
+  priority,
+  ...props
+}: {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  fill?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
+  priority?: boolean;
 }) => {
   const [isImageLoading, setImageLoading] = React.useState(true);
 
@@ -19,18 +31,20 @@ const ClientImageComponent = ({ src, alt, width, height, fill, className }: {
       src={src}
       alt={alt}
       fill={fill}
-      height={width}
-      width={height}
+      height={fill ? undefined : height}
+      width={fill ? undefined : width}
       onLoad={() => setImageLoading(false)}
       className={cn(
-        "transition-all duration-300 ease-in-out",
         className,
-        isImageLoading ? "blur-xl" : "blur-none"
+        "transition-all duration-200 ease-in-out",
+        isImageLoading ? "blur-md" : "blur-none"
       )}
-      loading="lazy"
+      style={style}
       decoding="async"
+      priority={priority}
+      {...props}
     />
   );
-}
+};
 
 export default ClientImageComponent;

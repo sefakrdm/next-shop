@@ -5,6 +5,7 @@ import { priceFormat } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import { ProductTypes } from "@/utils/definitions";
+import DynamicImage from "../DynamicImage";
 
 interface ProductItemProps {
   product: ProductTypes;
@@ -12,7 +13,7 @@ interface ProductItemProps {
   handleRemoveFavorite?: (id: string) => void;
 }
 
-const ProductItem: React.FC<ProductItemProps> = ({
+export const ProductItem: React.FC<ProductItemProps> = ({
   product,
   isFavorited,
   handleRemoveFavorite,
@@ -30,8 +31,9 @@ const ProductItem: React.FC<ProductItemProps> = ({
       )}
       <figure className="relative h-full">
         <Link
-          href={`/product/${product.slug}`}
-          title={product.title}
+          href={`/product/${product?.slug}`}
+          prefetch={true}
+          title={product?.title}
           className="flex justify-center items-center w-full h-full rounded-xl bg-white overflow-hidden mb-2 relative"
         >
           {product.ProductImages && product.ProductImages.length > 0 ? (
@@ -40,15 +42,27 @@ const ProductItem: React.FC<ProductItemProps> = ({
                 (image) => image.isMain
               );
               return mainImage ? (
-                <Image
-                  src={mainImage.url}
+                <DynamicImage
+                  url={mainImage.url}
                   alt={mainImage.alt}
                   width={200}
                   height={200}
                 />
               ) : (
-                <Image
-                  src={product.ProductImages[0].url}
+                // <Image
+                //   src={mainImage.url}
+                //   alt={mainImage.alt}
+                //   width={200}
+                //   height={200}
+                // />
+                // <Image
+                //   src={product.ProductImages[0].url}
+                //   alt={product.ProductImages[0].alt}
+                //   width={200}
+                //   height={200}
+                // />
+                <DynamicImage
+                  url={product.ProductImages[0].url}
                   alt={product.ProductImages[0].alt}
                   width={200}
                   height={200}
@@ -81,7 +95,7 @@ const ProductItem: React.FC<ProductItemProps> = ({
         </div>
       </figure>
       <aside className="flex flex-col justify-between items-center">
-        <Link href={`/${product.slug}`}>
+        <Link href={`/${product.slug}`} prefetch={true}>
           <h3 className="text-base font-medium line-clamp-2 text-center leading-tight">
             {product.title}
           </h3>
@@ -125,4 +139,4 @@ const ProductItem: React.FC<ProductItemProps> = ({
   );
 };
 
-export default ProductItem;
+// export default ProductItem;

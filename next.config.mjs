@@ -11,6 +11,11 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
+        protocol: "http",
+        hostname: "localhost",
+        // pathname: "**",
+      },
+      {
         protocol: "https",
         hostname: "www.bercostore.com",
         // pathname: "**",

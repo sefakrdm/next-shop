@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import ProductItem from '../products/ProductItem';
+import { ProductItem } from '../products/ProductItem';
 import productService from '@/lib/service/productService';
 
 const LastProducts:React.FC = async () => {

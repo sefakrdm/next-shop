@@ -6,9 +6,16 @@ export const revalidate = 3600; //! verileri en fazla saatte bir yeniden doğrul
 
 const getByUserId = cache(
   async (id: string): Promise<FavoriteTypes[] | null> => {
+
     const favorites = await db.favoriteProduct.findMany({
       where: { favorite: { userId: id } },
-      include: { product: true },
+      include: { 
+        product: { 
+          include: {
+            ProductImages: true 
+          }
+        } 
+      },
     });
 
     if (!favorites || favorites.length === 0) {

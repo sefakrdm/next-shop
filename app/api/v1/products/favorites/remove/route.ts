@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import dbConnect from "@/lib/mongodb";
 import { db } from "@/lib/db";
 
 export async function DELETE(request: NextRequest) {

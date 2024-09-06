@@ -3,7 +3,6 @@ import Image from "next/image";
 import { Input } from "../ui/input";
 import Link from "next/link";
 import BasketSheet from "./BasketSheet";
-import { Button } from "../ui/button";
 import AccountMenu from "./AccountMenu";
 import FavoritesButton from "./FavoritesButton";
 

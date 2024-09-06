@@ -1,3 +1,5 @@
+"use server"
+
 import { getPlaiceholder } from 'plaiceholder'
 
 export async function getImage(src: string) {

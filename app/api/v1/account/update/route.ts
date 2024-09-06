@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getSession } from "next-auth/react";
 import { NextResponse } from "next/server";
 
 export const PUT = auth(async function PUT(req: Request) {

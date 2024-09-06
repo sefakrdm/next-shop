@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { ProductImageTypes } from '@/utils/definitions';
+import ClientImageComponent from '../ClientImageComponent';
 
 const MAGNIFIER_SIZE = 140;
 const ZOOM_LEVEL = 1.5;
@@ -73,13 +74,14 @@ const ImageMagnifier: React.FC<{ image: ProductImageTypes }> = ({ image }) => {
         onMouseMove={handleMouseMove}
         className="w-full h-full relative overflow-hidden"
       >
-        <Image
+        <ClientImageComponent
           src={image.url}
           alt={image.alt}
           fill
           className="object-contain z-10"
           style={{}}
-        ></Image>
+          priority
+        />
 
         <div
           style={{

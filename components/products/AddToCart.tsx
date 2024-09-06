@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 import { CircleNotch, Minus, Plus } from "@phosphor-icons/react/dist/ssr";
 import { OrderItemTypes, ProductTypes } from "@/utils/definitions";
 
-export default function AddToCart({ item }: { item: ProductTypes }) {
+export function AddToCart({ item }: { item: ProductTypes }) {
   const router = useRouter();
   const { items, addCart, increase, decrease } = useCartService();
   const [loading, setLoading] = useState<boolean>(false);

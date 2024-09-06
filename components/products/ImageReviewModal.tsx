@@ -32,6 +32,7 @@ const ImageReviewModal:React.FC<ImageReviewModalProps> = ({ images, userName, co
             //   className="border rounded-md p-0.5 object-contain w-16 h-16"
             // />
             <ClientImageComponent
+              key={index}
               src={image}
               alt={userName}
               width={64}

@@ -1,25 +1,23 @@
+import { OrderItemTypes, PaymentTypes, ShippingTypes } from "@/utils/definitions";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { IOrderItem } from "../models/OrderModel";
-import { IShipping } from "../models/ShippingModel";
-import { IPayment } from "../models/PaymentModel";
 
 type Cart = {
-  items: IOrderItem[];
+  items: OrderItemTypes[];
   itemsPrice: number;
   taxPrice: number;
   shippingPrice: number;
   totalPrice: number;
-  selectedShipping: IShipping | null;
-  selectedPayment: IPayment | null;
+  selectedShipping: ShippingTypes | null;
+  selectedPayment: PaymentTypes | null;
   isCartPopupOpen: boolean;
   toggleCartPopup: (isOpen: boolean) => void;
-  addCart: (item: IOrderItem) => void;
-  increase: (item: IOrderItem) => void;
-  decrease: (item: IOrderItem) => void;
-  removeCart: (item: IOrderItem) => void;
-  selectShipping: (shipping: IShipping) => void;
-  selectPayment: (payment: IPayment) => void;
+  addCart: (item: OrderItemTypes) => void;
+  increase: (item: OrderItemTypes) => void;
+  decrease: (item: OrderItemTypes) => void;
+  removeCart: (item: OrderItemTypes) => void;
+  selectShipping: (shipping: ShippingTypes) => void;
+  selectPayment: (payment: PaymentTypes) => void;
 };
 
 const initialState: Cart = {
@@ -43,7 +41,7 @@ const initialState: Cart = {
 export const cartStore = create<Cart>()(
   persist((set, get) => ({
     ...initialState,
-    addCart: (item: IOrderItem) => {
+    addCart: (item: OrderItemTypes) => {
       const { items } = get();
       const exist = items.find((x) => x.slug === item.slug);
       const updatedCartItems = exist
@@ -62,7 +60,7 @@ export const cartStore = create<Cart>()(
       });
       set({ isCartPopupOpen: true });
     },
-    increase: (item: IOrderItem) => {
+    increase: (item: OrderItemTypes) => {
       const { items } = get();
       const exist = items.find((x) => x.slug === item.slug);
       const updatedCartItems = exist
@@ -80,13 +78,13 @@ export const cartStore = create<Cart>()(
         totalPrice,
       });
     },
-    decrease: (item: IOrderItem) => {
+    decrease: (item: OrderItemTypes) => {
       const { items } = get();
       const exist = items.find((x) => x.slug === item.slug);
       if (!exist) return;
       const updatedCartItems =
         exist.qty === 1
-          ? items.filter((x: IOrderItem) => x.slug !== item.slug)
+          ? items.filter((x: OrderItemTypes) => x.slug !== item.slug)
           : items.map((x) =>
               x.slug === item.slug ? { ...x, qty: x.qty - 1 } : x
             );
@@ -100,7 +98,7 @@ export const cartStore = create<Cart>()(
         totalPrice,
       });
     },
-    removeCart: (item: IOrderItem) => {
+    removeCart: (item: OrderItemTypes) => {
       const { items } = get();
       const updatedCartItems = items.filter((x) => x.slug !== item.slug);
 
@@ -115,7 +113,7 @@ export const cartStore = create<Cart>()(
         totalPrice,
       });
     },
-    selectShipping: (shipping: IShipping) => {
+    selectShipping: (shipping: ShippingTypes) => {
       const { items } = get();
       const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
         calcPrice(items, shipping, get().selectedPayment);
@@ -125,7 +123,7 @@ export const cartStore = create<Cart>()(
         totalPrice,
       });
     },
-    selectPayment: (payment: IPayment) => {
+    selectPayment: (payment: PaymentTypes) => {
       const { items } = get();
       const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
         calcPrice(items, get().selectedShipping, payment);
@@ -161,7 +159,7 @@ export default function useCartService() {
   };
 }
 
-const calcPrice = (items: IOrderItem[], selectedShipping: IShipping | null, selectedPayment: IPayment | null) => {
+const calcPrice = (items: OrderItemTypes[], selectedShipping: ShippingTypes | null, selectedPayment: PaymentTypes | null) => {
   const itemsTotalPrice = items.reduce((acc, item) => acc + item.price * item.qty, 0);
   const shippingPrice = selectedShipping ? selectedShipping.price : 0;
   const taxPrice = 0; // %20 KDV

@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import ProductItem from '../products/ProductItem';
+import React from 'react';
+import { ProductItem } from '@/components/products/ProductItem';
 import productService from '@/lib/service/productService';
 
-const SaleProducts:React.FC = async () => {
+export const SaleProducts: React.FC = async () => {
 
     // const [products, setProducts] = useState<ProductTypes[]>([]);
 
@@ -32,5 +31,3 @@ const SaleProducts:React.FC = async () => {
     </>
   );
 }
-
-export default SaleProducts

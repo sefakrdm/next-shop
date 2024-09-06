@@ -1,5 +1,4 @@
 import React from "react";
-import ProductItem from "../products/ProductItem";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,6 +10,12 @@ import {
 import Link from "next/link";
 import categoryService from "@/lib/service/categoryService";
 import productService from "@/lib/service/productService";
+import dynamic from "next/dynamic";
+
+const ProductItem = dynamic(() => import("../products/ProductItem").then((mod) => mod.ProductItem), {
+  loading: () => <div>Yükleniyor...</div>,
+  ssr: false,
+});
 
 interface CategoryDetailProps {
   slug: string;
@@ -68,17 +73,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = async ({ slug }) => {
                     {products?.map((prod, index) => (
                       <ProductItem
                         key={index}
-                        id={prod._id}
-                        title={prod.title}
-                        price={prod.price}
-                        slug={prod.slug}
-                        discountPercentage={
-                          prod.discountPercentage || undefined
-                        }
-                        stock={prod.stock || 0}
-                        images={prod.images || []}
-                        isNewProduct={prod.isNewProduct}
-                        isFreeShipping={prod.isFreeShipping}
+                        product={prod}
                       />
                     ))}
                   </>

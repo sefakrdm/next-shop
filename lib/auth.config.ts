@@ -1,4 +1,4 @@
-import type { NextAuthConfig } from "next-auth";
+import type { DefaultSession, NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { LoginSchema } from "@/schemas";
 import { db } from "./db";
@@ -44,13 +44,13 @@ export default {
               phone: user.phone ?? undefined,
               emailVerified: user.emailVerified ?? null,
               image: user.image ?? null,
-              birthday: user.birthday ?? null,
+              birthday: user.birthday ? user.birthday.toISOString() : undefined,
               gender: user.gender ?? null,
               role: user.role,
               lastLogin: user.lastLogin ?? null,
               createdAt: user.createdAt,
               updatedAt: user.updatedAt,
-            };
+            } as unknown as User;
           }
         }
 
@@ -68,7 +68,7 @@ export default {
           name: token.name as string,
           surname: token.surname as string,
           phone: token.phone as string,
-          birthday: token.birthday as Date,
+          birthday: token.birthday instanceof Date ? token.birthday.toISOString() : undefined,
           gender: token.gender as string,
           role: token.role as string,
           lastLogin: token.lastLogin as Date,
@@ -76,7 +76,7 @@ export default {
             ? session?.user.emailVerified
             : null,
         },
-      };
+      } as unknown as DefaultSession;
     },
     jwt: async ({ token, user, trigger, session }) => {
       if (user) {
