@@ -2,7 +2,6 @@
 
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -15,8 +14,10 @@ import { Calendar, CircleNotch } from "@phosphor-icons/react/dist/ssr";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { format } from "date-fns";
-import { tr } from "date-fns/locale";
+import { se, tr } from "date-fns/locale";
 import { CalendarUI } from "@/components/custom-ui/CalendarUI";
+import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Inputs = {
   name: string;
@@ -25,12 +26,13 @@ type Inputs = {
   phone: string;
   password: string;
   confirmPassword: string;
-  birthday: string;
+  birthday: Date | null;
   gender: string;
 };
 
 const Form = () => {
   const { data: session, status, update } = useSession();
+
   const router = useRouter();
 
   const {
@@ -44,9 +46,9 @@ const Form = () => {
     defaultValues: {
       name: "",
       surname: "",
-      email: '',
+      email: "",
       phone: "",
-      birthday: "",
+      birthday: null,
       gender: "",
     },
   });
@@ -55,9 +57,9 @@ const Form = () => {
     if (session && session.user) {
       setValue("name", session.user.name || "");
       setValue("surname", session.user.surname || "");
-      setValue('email', session.user.email || "");
+      setValue("email", session.user.email || "");
       setValue("phone", session.user.phone || "");
-      setValue("birthday", session.user.birthday || "");
+      setValue("birthday", session.user.birthday || null);
       setValue("gender", session.user.gender || "");
     }
   }, [router, session, setValue]);
@@ -166,7 +168,8 @@ const Form = () => {
               control={control}
               rules={{
                 validate: (value) =>
-                  value && isValidPhoneNumber(value?.toString()) || "Geçersiz telefon numarası"
+                  (value && isValidPhoneNumber(value?.toString())) ||
+                  "Geçersiz telefon numarası",
               }}
               render={({ field: { onChange, value } }) => (
                 <PhoneInput
@@ -174,7 +177,7 @@ const Form = () => {
                   defaultCountry="TR"
                   international
                   withCountryCallingCode
-                  value={value as any || ""}
+                  value={(value as any) || ""}
                   onChange={(v) => onChange(v as string)}
                   className={cn(
                     "flex w-full border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 border rounded-md h-12 p-4 focus-visible:ring-0 focus-visible:shadow-none focus-visible:ring-offset-0 focus-visible:border-blue-600",
@@ -218,11 +221,12 @@ const Form = () => {
                   <PopoverContent className="w-[300px] rounded-lg bg-white p-5 shadow-md">
                     <CalendarUI
                       mode="single"
-                      selected={value as any || ""}
+                      selected={new Date(value as any) || ""}
                       onSelect={onChange}
                       disabled={(date) =>
                         date > new Date() || date < new Date("1900-01-01")
                       }
+                      defaultMonth={new Date(value || new Date())}
                     />
                   </PopoverContent>
                 </Popover>

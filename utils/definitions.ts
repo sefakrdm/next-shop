@@ -1,5 +1,6 @@
 export type CategoryTypes = {
   _id: string;
+  id: string;
   title: string;
   description?: string;
   slug: string;
@@ -28,12 +29,7 @@ export type ProductTypes = {
   title: string;
   description?: string;
   shortDescription?: string;
-  price?: {
-    buyPrice: number;
-    sellPrice?: number;
-    currency?: string;
-    currencyCode?: string;
-  };
+  prices?: PriceTypes[];
   discountPercentage?: number;
   stock: number;
   slug: string;
@@ -59,6 +55,12 @@ export type ProductTypes = {
   OrderItem: OrderItemTypes[];
   Review: ReviewTypes[];
   qty: number;
+};
+
+export type PriceTypes = {
+  currency: string;
+  sellPrice: number;
+  discountPrice: number;
 };
 
 export type ProductImageTypes = {
@@ -137,4 +139,16 @@ export type ShippingTypes = {
   status: boolean;
   apiKey: string;
   privApiKey: string;
+}
+
+export type SiteSettingTypes = {
+  _id: string;
+  id: string;
+  title: string;
+  description?: string;
+  defaultLang?: string;
+  currency?: string;
+  isMaintenanceMode: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }

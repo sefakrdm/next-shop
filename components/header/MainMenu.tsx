@@ -30,7 +30,7 @@ const MainMenu: React.FC<{ categories: CategoryTypes[] }> = ({ categories }) => 
                   </Link>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-3 lg:w-[600px] ">
+                  <ul className={cn("grid w-[400px] gap-3 p-4 md:w-[500px] lg:w-[600px]", cat.childCategories.length > 4 ? "md:grid-cols-3" : "md:grid-cols-1 lg:w-[250px]")}>
                     {cat.childCategories.map((subCat, subIndex) => (
                       <ListItem
                         key={subIndex}
@@ -48,7 +48,7 @@ const MainMenu: React.FC<{ categories: CategoryTypes[] }> = ({ categories }) => 
                 <NavigationMenuLink asChild>
                   <Link
                     href={`/category/${cat.slug}`}
-                    className="hover:text-primary transition-all py-3"
+                    className="block hover:text-primary transition-all py-3"
                   >
                     {cat.title}
                   </Link>

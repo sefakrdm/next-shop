@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import { ProductTypes } from "@/utils/definitions";
 import DynamicImage from "../DynamicImage";
+import ClientImage from "../ClientImage";
 
 interface ProductItemProps {
   product: ProductTypes;
@@ -42,11 +43,12 @@ export const ProductItem: React.FC<ProductItemProps> = ({
                 (image) => image.isMain
               );
               return mainImage ? (
-                <DynamicImage
+                <ClientImage
                   url={mainImage.url}
                   alt={mainImage.alt}
-                  width={200}
-                  height={200}
+                  fill
+                  className="object-contain"
+                  containerClass="w-52 h-60"
                 />
               ) : (
                 // <Image
@@ -61,11 +63,12 @@ export const ProductItem: React.FC<ProductItemProps> = ({
                 //   width={200}
                 //   height={200}
                 // />
-                <DynamicImage
+                <ClientImage
                   url={product.ProductImages[0].url}
                   alt={product.ProductImages[0].alt}
-                  width={200}
-                  height={200}
+                  fill
+                  className="object-contain"
+                  containerClass="w-52 h-60"
                 />
               );
             })()
@@ -94,34 +97,32 @@ export const ProductItem: React.FC<ProductItemProps> = ({
           )}
         </div>
       </figure>
-      <aside className="flex flex-col justify-between items-center">
+      <aside className="flex flex-col justify-between items-start">
         <Link href={`/${product.slug}`} prefetch={true}>
           <h3 className="text-base font-medium line-clamp-2 text-center leading-tight">
             {product.title}
           </h3>
         </Link>
-        <div className="flex items-center justify-center my-3 space-x-1">
+        <div className="flex items-center justify-start mt-2.5 space-x-1">
           <span className="text-lg text-slate-700 font-bold">
-            {product?.price?.currency &&
-              product?.price &&
+            {product?.prices && product?.prices[0].currency &&
               priceFormat(
-                product?.price?.currency,
-                product?.price?.currency,
+                product?.prices[0].currency,
+                product?.prices[0].currency,
                 "tr-TR",
-                product?.price?.sellPrice || 0
+                product?.prices[0].sellPrice || 0
               )}
           </span>
-          <span className="text-sm text-slate-600 font-bold">
+          {/* <span className="text-sm text-slate-600 font-bold">
             -{" "}
-            {product?.price?.currency &&
-              product?.price &&
+            {product?.prices && product?.prices[0].currency &&
               priceFormat(
-                product?.price?.currency,
+                product?.prices[0].currency,
                 "USD",
                 "tr-TR",
-                product?.price?.sellPrice || 0
+                product?.prices[0].sellPrice || 0
               )}
-          </span>
+          </span> */}
         </div>
         {/* <div className="w-full">
           {stock && stock > 0 ? (

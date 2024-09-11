@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
           products = await db.product.findMany({
             take: limit,
             where: { isActive: true },
-            include: { category: true, ProductImages: true },
+            include: { category: true, ProductImages: true, Review: true, prices: true },
             orderBy: { createdAt: "desc" },
           });
         break;
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
           products = await db.product.findMany({
             take: limit,
             where: { isActive: true, isFeatured: true },
-            include: { category: true },
+            include: { category: true, ProductImages: true, Review: true, prices: true },
             orderBy: { createdAt: "desc" },
           });
         break;
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
           products = await db.product.findMany({
             take: limit,
             where: { isActive: true, isHomePage: true },
-            include: { category: true },
+            include: { category: true, ProductImages: true, Review: true, prices: true },
             orderBy: { createdAt: "desc" },
           });
         break;
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
           products = await db.product.findMany({
             take: limit,
             where: { isActive: true, isNewProduct: true },
-            include: { category: true },
+            include: { category: true, ProductImages: true, Review: true, prices: true },
             orderBy: { createdAt: "desc" },
           });
         break;
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
           products = await db.product.findMany({
             take: limit,
             where: { isActive: true, isBestSeller: true },
-            include: { category: true },
+            include: { category: true, ProductImages: true, Review: true, prices: true },
             orderBy: { createdAt: "desc" },
           });
         break;

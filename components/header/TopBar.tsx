@@ -2,8 +2,14 @@ import React from 'react'
 import { EnvelopeSimple, FacebookLogo, InstagramLogo, LinkedinLogo, Phone } from '@phosphor-icons/react/dist/ssr';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Separator } from '../ui/separator';
+import LocaleSwitcherSelect from './LocaleSwitcherSelect';
+import { useLocale, useTranslations } from 'next-intl';
+import { routing } from '@/i18n/routing';
 
 const TopBar:React.FC = () => {
+  const t = useTranslations('LocaleSwitcher');
+  const locale = useLocale();
+
   return (
     <section className="mt-1">
       <div className="container">
@@ -36,16 +42,13 @@ const TopBar:React.FC = () => {
               <LinkedinLogo size={22} />
             </a>
             <Separator orientation="vertical" />
-            <Select defaultValue="tr">
-              <SelectTrigger className="w-32 ring-0 focus:ring-0 focus:outline-offset-0 focus:ring-offset-0 outline-none border-none bg-transparent">
-                <SelectValue placeholder="Türkçe" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="tr">Türkçe</SelectItem>
-                <SelectItem value="en">İngilizce</SelectItem>
-                <SelectItem value="de">Almanca</SelectItem>
-              </SelectContent>
-            </Select>
+            <LocaleSwitcherSelect defaultValue={locale}>
+              {routing.locales.map((cur) => (
+                <SelectItem key={cur} value={cur}>
+                  {t('locale', {locale: cur})}
+                </SelectItem>
+              ))}
+            </LocaleSwitcherSelect>
           </div>
         </div>
       </div>

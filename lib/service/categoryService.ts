@@ -1,6 +1,7 @@
 import { CategoryTypes } from "@/utils/definitions";
 import { cache } from "react";
 import { db } from "../db";
+import { ObjectId } from "mongodb";
 
 export const revalidate = 3600; //! verileri en fazla saatte bir yeniden doğrulayın
 
@@ -22,8 +23,10 @@ const getLatest = cache(async (limit: number | null): Promise<CategoryTypes[] | 
 
 const getChildCategories = cache(async (categoryId: string): Promise<CategoryTypes[] | null> => {
 
+  const categoryObjectId = categoryId ? ObjectId.createFromHexString(categoryId) : null;
+
   const categories = await db.category.findMany({
-    where: { parentCategoryId: categoryId },
+    where: { parentCategoryId: categoryObjectId?.toString() || null },
     include: { childCategories: true },
     orderBy: { createdAt: "desc" },
   });

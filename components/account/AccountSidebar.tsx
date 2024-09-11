@@ -22,7 +22,7 @@ const AccountSidebar: React.FC = () => {
           Hoş geldin{" "}
           <strong>{session?.user.name + " " + session?.user.surname}</strong>
         </p>
-        <p className='text-xs text-muted-foreground'>Son giriş:{" "} <strong>{moment(new Date(session?.user.lastLogin || 0)).format("LLL")}</strong></p>
+        <p className='text-xs text-muted-foreground'>Son giriş:{" "} <strong>{moment(new Date(session?.user.lastLogin || new Date())).format("LLL")}</strong></p>
       </div>
       <div className="bg-white drop-shadow-md rounded-lg space-y-2.5 p-5">
         <ul className="flex flex-col w-full space-y-1">

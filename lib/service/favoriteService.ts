@@ -1,20 +1,24 @@
 import { FavoriteTypes } from "@/utils/definitions";
 import { cache } from "react";
 import { db } from "../db";
+import { ObjectId } from "mongodb";
 
 export const revalidate = 3600; //! verileri en fazla saatte bir yeniden doğrulayın
 
 const getByUserId = cache(
-  async (id: string): Promise<FavoriteTypes[] | null> => {
+  async (userId: string): Promise<FavoriteTypes[] | null> => {
+    if (!userId) return null;
+
+    const userObjectId = userId ? ObjectId.createFromHexString(userId) : null;
 
     const favorites = await db.favoriteProduct.findMany({
-      where: { favorite: { userId: id } },
-      include: { 
-        product: { 
+      where: { favorite: { userId: userObjectId?.toString() } },
+      include: {
+        product: {
           include: {
-            ProductImages: true 
-          }
-        } 
+            ProductImages: true,
+          },
+        },
       },
     });
 
@@ -28,10 +32,7 @@ const getByUserId = cache(
 );
 
 const getByUserProductId = cache(
-  async (
-    productId: string,
-    userId: string
-  ): Promise<boolean> => {
+  async (productId: string, userId: string): Promise<boolean> => {
     if (!userId || !productId) return false;
 
     const favorites = await db.favoriteProduct.findMany({

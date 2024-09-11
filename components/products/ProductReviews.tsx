@@ -9,16 +9,17 @@ import moment from "moment";
 import "moment/locale/tr";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { ReviewTypes } from "@/utils/definitions";
+import { ProductTypes, ReviewTypes } from "@/utils/definitions";
 import Image from "next/image";
 import ImageReviewModal from "./ImageReviewModal";
 import ClientImageComponent from "../ClientImageComponent";
 
 interface ReviewsProps {
   reviews: ReviewTypes[];
+  product: ProductTypes;
 }
 
-export const ProductReviews: React.FC<ReviewsProps> = ({ reviews }) => {
+export const ProductReviews: React.FC<ReviewsProps> = ({ reviews, product }) => {
   const [filterReview, setFilterReview] = useState<number | null>(null);
 
   const totalReviews = reviews.length;
@@ -180,6 +181,7 @@ export const ProductReviews: React.FC<ReviewsProps> = ({ reviews }) => {
               <div>{review.comment}</div>
               {review.images && review.images.length > 0 && (
                 <ImageReviewModal
+                  product={product}
                   images={review.images}
                   userName={review.userName}
                   comment={review.comment}

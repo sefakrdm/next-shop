@@ -1,8 +1,8 @@
 "use client";
 
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
-import { startTransition, useEffect, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { useSession } from "next-auth/react";
 import { login } from "@/lib/actions/login";
+import { useRouter } from "@/i18n/routing";
 
 type Inputs = {
   email: string;
@@ -55,7 +56,7 @@ const Form = () => {
       if(result && result.error) {
         setError(result!.error!);
       } else {
-        window.location.reload();
+        router.push(callbackUrl);
       };
     });
   };
@@ -82,8 +83,8 @@ const Form = () => {
         </Alert>
       )}
 
-      <form className="space-y-4" onSubmit={handleSubmit(formSubmit)}>
-        <div className="flex flex-col space-y-0.5">
+      <form className="space-y-4 w-full" onSubmit={handleSubmit(formSubmit)}>
+        <div className="flex flex-col space-y-0.5 w-full">
           <label htmlFor="email" className="font-semibold">
             E-Posta
           </label>

@@ -1,12 +1,14 @@
+import createNextIntlPlugin from 'next-intl/plugin';
 import withPlaiceholder from '@plaiceholder/next';
+
+const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // experimental: {
-  //   appDir: true,
-  //   runtime: 'nodejs',
-  // },
+  experimental: {
+    appDir: true,
+  },
   swcMinify: true,
   images: {
     remotePatterns: [
@@ -29,4 +31,4 @@ const nextConfig = {
   },
 };
 
-export default withPlaiceholder(nextConfig);
+export default withPlaiceholder(withNextIntl(nextConfig));

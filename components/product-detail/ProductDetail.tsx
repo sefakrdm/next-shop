@@ -19,6 +19,8 @@ import AddFavoriteButton from "./AddFavoriteButton";
 import { auth } from "@/lib/auth";
 import favoriteService from "@/lib/service/favoriteService";
 import dynamic from "next/dynamic";
+import { ProductTypes } from "@/utils/definitions";
+import { notFound } from "next/navigation";
 
 const LazyProductItem = dynamic(() => import("../products/ProductItem").then((mod) => mod.ProductItem), {
   loading: () => <div>Yükleniyor...</div>,
@@ -67,6 +69,8 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
   const totalReviews = product?.Review?.length ?? 0;
   const totalRating = product?.Review?.reduce((sum, review) => sum + review.rate, 0) ?? 0;
   const averageRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(2) : "0.00";
+
+  if(!product) return notFound();
 
   return (
     <>
@@ -145,24 +149,22 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
               </div>
               <div className="flex flex-col mb-1">
                 <span className="text-3xl font-bold text-slate-800">
-                  {product?.price?.currency &&
-                    product?.price &&
+                  {product?.prices && product?.prices[0].currency &&
                     priceFormat(
-                      product?.price?.currency,
-                      product?.price?.currency,
+                      product?.prices[0].currency,
+                      product?.prices[0].currency,
                       "tr-TR",
-                      product?.price?.sellPrice || 0
+                      product?.prices[0].sellPrice || 0
                     )}
                 </span>
                 <span className="text-base font-bold text-slate-600">
                   -{" "}
-                  {product?.price?.currency &&
-                    product?.price &&
+                  {product?.prices && product?.prices[0].currency &&
                     priceFormat(
-                      product?.price?.currency,
+                      product?.prices[0].currency,
                       "USD",
                       "tr-TR",
-                      product?.price?.sellPrice || 0
+                      product?.prices[0].sellPrice || 0
                     )}
                 </span>
               </div>
@@ -241,6 +243,7 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
             >
               <ProductReviews
                 reviews={product?.Review ? product?.Review : []}
+                product={product ?? {} as ProductTypes}
               />
             </TabsContent>
           </Tabs>

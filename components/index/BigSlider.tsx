@@ -15,7 +15,7 @@ const BigSlider: React.FC = () => {
         <CarouselItem className="relative">
           {/* <Image src="/images/slider-3.jpg" width={1520} height={500} alt="" className="object-cover rounded-xl" /> */}
           <DynamicImage
-            url={`${process.env.NEXT_PUBLIC_URL}/images/slider-3.jpg`}
+            url="/uploads/images/main-slider/slider-3.jpg"
             alt={""}
             width={1520}
             height={500}
@@ -26,7 +26,7 @@ const BigSlider: React.FC = () => {
         <CarouselItem className="relative">
           {/* <Image src="/images/slider-4.jpg" width={1520} height={500} alt="" className="object-cover rounded-xl" /> */}
           <DynamicImage
-            url={`${process.env.NEXT_PUBLIC_URL}/images/slider-4.jpg`}
+            url="/uploads/images/main-slider/slider-4.jpg"
             alt={""}
             width={1520}
             height={500}

@@ -13,6 +13,8 @@ export function cn(...inputs: ClassValue[]) {
 
 export function priceFormat(fromCurrency: string, toCurrency: string, locale: Intl.LocalesArgument, price: number) {
 
+  if(!fromCurrency && !toCurrency && !price) return null;
+
   const conversionRates: ConversionRates = {
       'TRY': {'TRY': 1, 'USD': 0.031, 'EUR': 0.029},
       'USD': {'USD': 1, 'TRY': 32.28, 'EUR': 0.93},

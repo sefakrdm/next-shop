@@ -35,19 +35,21 @@ export default function ClientImage({
   }, [url]);
 
   if (!imageData) {
-    return <div className="loading"></div>;
+    return <div className={cn(containerClass)}></div>;
   }
 
   return (
-    <Image
-      {...imageData.img}
-      alt={alt || ""}
-      placeholder="blur"
-      blurDataURL={imageData.base64}
-      width={width}
-      height={height}
-      fill={fill}
-      className={className}
-    />
+    <div className={cn("relative", containerClass)}>
+      <Image
+        {...imageData.img}
+        alt={alt || ""}
+        placeholder="blur"
+        blurDataURL={imageData.base64}
+        width={width}
+        height={height}
+        fill={fill}
+        className={className}
+      />
+    </div>
   );
 }

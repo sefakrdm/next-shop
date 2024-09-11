@@ -10,5 +10,9 @@ export default async function Providers({
 
   const session = await auth();
   
-  return <ClientProviders session={session}>{children}</ClientProviders>;
+  return (
+    <ClientProviders session={session}>
+      {children}
+    </ClientProviders>
+  );
 }

@@ -15,6 +15,8 @@ export const PUT = auth(async function PUT(req: Request) {
       return NextResponse.json({ message: "Kullanıcı bulunamadı" }, { status: 404 });
     }
 
+    const dateBirthday = birthday ? new Date(birthday) : null;
+
     await db.user.update({
       where: { id: user.id },
       data: {
@@ -22,7 +24,7 @@ export const PUT = auth(async function PUT(req: Request) {
         surname,
         email,
         phone,
-        birthday,
+        birthday: dateBirthday,
         gender,
       },
     });

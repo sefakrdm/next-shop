@@ -3,7 +3,7 @@ import BigSlider from "@/components/index/BigSlider";
 import dynamic from "next/dynamic";
 // import SaleProducts from "@/components/index/SaleProducts";
 
-const LazySaleProducts = dynamic(() => import("../../components/index/SaleProducts").then((mod) => mod.SaleProducts), {
+const LazySaleProducts = dynamic(() => import("@/components/index/SaleProducts").then((mod) => mod.SaleProducts), {
   loading: () => <div>Yükleniyor...</div>,
 });
 
