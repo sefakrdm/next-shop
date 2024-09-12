@@ -76,7 +76,7 @@ export const ProductItem: React.FC<ProductItemProps> = ({
             <div>Resim Yok</div>
           )}
         </Link>
-        <div className="w-14 absolute space-y-1 -top-3 -right-3">
+        <div className="w-14 absolute space-y-1 -top-3 -left-3">
           {product.discountPercentage && (
             <div className="flex flex-col justify-center w-14 items-center bg-red-600 text-white rounded-lg h-9 text-[10px] font-extrabold text-center leading-[1.19] uppercase shadow-sm">
               <span className="font-black text-sm">

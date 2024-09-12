@@ -14,7 +14,7 @@ const MainHead: React.FC = () => {
           <div>
             <Link href="/">
               <Image
-                src="/images/bercostore-yeni-logo.png"
+                src="/uploads/images/bercostore-yeni-logo.png"
                 className="object-contain"
                 width="200"
                 height="130"

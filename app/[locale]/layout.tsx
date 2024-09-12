@@ -4,14 +4,13 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import NextTopLoader from "nextjs-toploader";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
-import { routing } from "@/i18n/routing";
+import { getMessages } from "next-intl/server";
 
 const urbanist = Urbanist({ subsets: ["latin"] });
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({locale}));
-}
+// export function generateStaticParams() {
+//   return routing.locales.map((locale) => ({locale}));
+// }
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -28,7 +27,7 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
+    <html lang={locale || "tr"}>
       <body className={urbanist.className}>
         <NextIntlClientProvider messages={messages}>
           <Providers>

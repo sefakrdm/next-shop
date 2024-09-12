@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { GridFour, GridNine } from "@phosphor-icons/react/dist/ssr";
 
 interface DetailHeadProps {
   category: CategoryTypes;
@@ -49,23 +50,31 @@ const DetailHead: React.FC<DetailHeadProps> = ({
       <h1 className="capitalize text-xl font-semibold">{category?.title}</h1>
       <div className="flex items-center space-x-5">
         <Select defaultValue={listOption || "1"} onValueChange={(value) => router.push(pathname + '?' + createQueryString('l', value))}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[150px] h-9">
             <SelectValue placeholder="Theme" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="1">Son Eklenen</SelectItem>
+            <SelectItem value="4">İlk Eklenen</SelectItem>
             <SelectItem value="2">Artan Fiyat</SelectItem>
             <SelectItem value="3">Azalan Fiyat</SelectItem>
+            <SelectItem value="5">Artan İndirim</SelectItem>
+            <SelectItem value="6">Azalan İndirim</SelectItem>
           </SelectContent>
         </Select>
         <ToggleGroup
           type="single"
           variant="outline"
+          size="sm"
           defaultValue={viewProduct}
           onValueChange={changeViewProduct}
         >
-          <ToggleGroupItem value="grid-4">B</ToggleGroupItem>
-          <ToggleGroupItem value="gird-3">A</ToggleGroupItem>
+          <ToggleGroupItem value="grid-4">
+            <GridNine className="text-base" />
+          </ToggleGroupItem>
+          <ToggleGroupItem value="gird-3">
+            <GridFour className="text-base" />
+          </ToggleGroupItem>
         </ToggleGroup>
       </div>
     </div>

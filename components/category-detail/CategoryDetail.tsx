@@ -17,7 +17,6 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
-import { locale } from "moment";
 
 const ProductItem = dynamic(
   () => import("../products/ProductItem").then((mod) => mod.ProductItem),
@@ -51,9 +50,15 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
       case "1":
         return "createdAt";
       case "2":
-        return "price.buyPrice";
+        return "price";
       case "3":
-        return "price.sellPrice";
+        return "price";
+      case "4":
+        return "createdAt";
+      case "5":
+        return "discount";
+      case "6":
+        return "discount";
       default:
         return "createdAt";
     }
@@ -64,9 +69,15 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
       case "1":
         return "desc";
       case "2":
-        return "asc";
+        return "desc";
       case "3":
         return "asc";
+      case "4":
+        return "asc";
+      case "5":
+        return "asc";
+      case "6":
+        return "desc";
       default:
         return "desc";
     }
@@ -79,8 +90,8 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
       filterList: [],
       locale: "tr",
       order: {
-        direction: getDirection(listOption),
         type: getOrderType(listOption),
+        direction: getDirection(listOption),
       },
       page: 1,
       limit: 10,
@@ -92,9 +103,7 @@ const CategoryDetail: React.FC<CategoryDetailProps> = ({
       await axios
         .post(`/api/v1/products/category/slug/${category?.slug}`, apiData)
         .then((response) => {
-          if (response.data.products != null) {
-            setProducts(response.data.products);
-          }
+          setProducts(response.data.products);
         })
         .catch((error) => {
           console.log(error);

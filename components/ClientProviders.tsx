@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { SessionProvider } from 'next-auth/react';
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "next/navigation";
 
 export default function ClientProviders({
   children,
@@ -26,7 +26,7 @@ export default function ClientProviders({
     }, 120000);
 
     return () => clearInterval(id);
-  }, []);
+  }, [router]);
 
   return (
     <SessionProvider session={session}>

@@ -108,13 +108,13 @@ const ImageReviewModal:React.FC<ImageReviewModalProps> = ({ product, images, use
                     <div className="flex flex-col justify-around">
                       <div className="text-sm font-medium line-clamp-2">{product.title} Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit laudantium, saepe a ea pariatur quis tenetur deleniti voluptates numquam debitis ut voluptatum harum voluptatem ad veniam omnis! Est, ipsum quos.</div>
                       <div className="text-base font-bold text-primary">
-                        {product?.price?.currency &&
-                          product?.price &&
+                        {product?.prices && product?.prices[0].currency &&
+                          
                           priceFormat(
-                            product?.price?.currency,
-                            product?.price?.currency,
+                            product?.prices[0].currency,
+                            product?.prices[0].currency,
                             "tr-TR",
-                            product?.price?.sellPrice || 0
+                            product?.prices[0].sellPrice || 0
                           )}
                       </div>
                     </div>

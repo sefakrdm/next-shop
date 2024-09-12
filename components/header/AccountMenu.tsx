@@ -21,7 +21,7 @@ const AccountMenu: React.FC = () => {
   return (
     <>
       {session && session.user ? (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button className="flex items-center space-x-2 rounded-xl bg-slate-100 hover:bg-blue-600 hover:text-white transition-all px-4 py-2 h-12 text-inherit">
               <User size={24} />
