@@ -128,7 +128,7 @@ const ProductDetail = async ({ slug }: { slug: string }) => {
                     </div>
                     <ReactRating
                       style={{ maxWidth: 100 }}
-                      value={Math.round(parseFloat(averageRating))}
+                      value={parseFloat(averageRating)}
                       itemStyles={{
                         itemShapes: RoundedStar,
                         activeFillColor: "#facc15",

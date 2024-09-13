@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
         include: {
           category: true,
           ProductImages: true,
+          Review: { select: { rate: true } },
           prices: true,
         },
         skip: (page - 1) * limit, // Pagination skip
@@ -60,6 +61,7 @@ export async function POST(request: NextRequest) {
         include: {
           category: true,
           ProductImages: true,
+          Review: { select: { rate: true } },
           prices: true,
         },
         skip: (page - 1) * limit, // Pagination skip
@@ -85,6 +87,7 @@ export async function POST(request: NextRequest) {
         include: {
           category: true,
           ProductImages: true,
+          Review: { select: { rate: true } },
           prices: true,
         },
         skip: (page - 1) * limit, // Pagination skip

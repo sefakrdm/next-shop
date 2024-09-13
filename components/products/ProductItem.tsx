@@ -5,7 +5,8 @@ import { priceFormat } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { X } from "@phosphor-icons/react/dist/ssr";
 import { ProductTypes } from "@/utils/definitions";
-import DynamicImage from "../DynamicImage";
+import { Rating as ReactRating, RoundedStar } from '@smastrom/react-rating';
+import "@smastrom/react-rating/style.css";
 import ClientImage from "../ClientImage";
 
 interface ProductItemProps {
@@ -19,6 +20,13 @@ export const ProductItem: React.FC<ProductItemProps> = ({
   isFavorited,
   handleRemoveFavorite,
 }) => {
+
+  const totalReviews = product.Review?.length || 0;
+  
+  const totalRating = product.Review.reduce((sum, review) => sum + review.rate, 0);
+  const averageRating =
+    totalReviews > 0 ? (totalRating / totalReviews).toFixed(2) : "0.00";
+
   return (
     <div className="flex flex-col justify-between drop-shadow-md rounded-xl p-5 bg-white group h-full relative">
       {isFavorited && (
@@ -97,15 +105,30 @@ export const ProductItem: React.FC<ProductItemProps> = ({
           )}
         </div>
       </figure>
-      <aside className="flex flex-col justify-between items-start">
+      <aside className="flex flex-col justify-between items-start space-y-2">
         <Link href={`/${product.slug}`} prefetch={true}>
           <h3 className="text-base font-medium line-clamp-2 text-center leading-tight">
             {product.title}
           </h3>
         </Link>
-        <div className="flex items-center justify-start mt-2.5 space-x-1">
-          <span className="text-lg text-slate-700 font-bold">
-            {product?.prices && product?.prices[0].currency &&
+        <div className="flex items-center space-x-1.5">
+          <ReactRating
+            style={{ maxWidth: 80 }}
+            value={parseFloat(averageRating)}
+            itemStyles={{
+              itemShapes: RoundedStar,
+              activeFillColor: "#facc15",
+              inactiveFillColor: "#d8d8d8",
+            }}
+            transition="zoom"
+            readOnly
+          />
+          <p className="text-xs font-semibold">{totalReviews} Yorum</p>
+        </div>
+        <div className="flex items-center justify-start space-x-1">
+          <span className="text-lg text-slate-700 font-extrabold">
+            {product?.prices &&
+              product?.prices[0].currency &&
               priceFormat(
                 product?.prices[0].currency,
                 product?.prices[0].currency,
@@ -124,17 +147,17 @@ export const ProductItem: React.FC<ProductItemProps> = ({
               )}
           </span> */}
         </div>
-        {/* <div className="w-full">
-          {stock && stock > 0 ? (
-            <Button size="sm" className="w-full font-semibold">
+        <div className="w-full">
+          {product.stock && product.stock > 0 ? (
+            <Button size="sm" variant="secondary" className="w-full font-semibold">
               Sepete Ekle
             </Button>
           ) : (
-            <Button size="sm" className="w-full font-semibold" disabled>
+            <Button size="sm" variant="secondary" className="w-full font-semibold" disabled>
               Tükendi
             </Button>
           )}
-        </div> */}
+        </div>
       </aside>
     </div>
   );

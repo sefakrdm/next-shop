@@ -402,8 +402,8 @@ model Review {
   id                  String         @id @default(auto()) @map("_id") @db.ObjectId
   rate                Float
   comment             String
-  images              String[]
-  userName            String
+  images              Json?
+  hiddenName          Boolean        @default(false)
   userId              String         @db.ObjectId
   productId           String         @db.ObjectId
 

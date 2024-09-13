@@ -15,7 +15,11 @@ export type ReviewTypes = {
   rate: number;
   comment: string;
   images: string[];
-  userName: string;
+  user: {
+    name: string;
+    surname: string;
+  }
+  hiddenName: boolean;
   userId: string;
   productId: string;
   createdAt: Date;

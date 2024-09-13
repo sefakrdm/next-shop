@@ -8,19 +8,24 @@ import { Separator } from "../ui/separator";
 import moment from "moment";
 import "moment/locale/tr";
 import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
+import { cn, firstLastLetter, firstLetter } from "@/lib/utils";
 import { ProductTypes, ReviewTypes } from "@/utils/definitions";
 import Image from "next/image";
 import ImageReviewModal from "./ImageReviewModal";
 import ClientImageComponent from "../ClientImageComponent";
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
+import { empty } from "@prisma/client/runtime/library";
 
 interface ReviewsProps {
   reviews: ReviewTypes[];
   product: ProductTypes;
 }
 
-export const ProductReviews: React.FC<ReviewsProps> = ({ reviews, product }) => {
-  const [filterReview, setFilterReview] = useState<number | null>(null);
+export const ProductReviews: React.FC<ReviewsProps> = ({
+  reviews,
+  product,
+}) => {
+  const [filterReview, setFilterReview] = useState<string[]>();
 
   const totalReviews = reviews.length;
   const getReviewCount = (rate: number) =>
@@ -35,9 +40,9 @@ export const ProductReviews: React.FC<ReviewsProps> = ({ reviews, product }) => 
 
   // Filtrelenen yorumları hesapla
   const filteredReviews =
-    filterReview === null
-      ? reviews
-      : reviews.filter((r) => r.rate === filterReview);
+    filterReview && filterReview.length > 0
+      ? reviews.filter((r) => filterReview.includes(String(r.rate)))
+      : reviews;
 
   const filterImageReviews = filteredReviews.filter(
     (r) => r.images && r.images.length > 0
@@ -50,7 +55,7 @@ export const ProductReviews: React.FC<ReviewsProps> = ({ reviews, product }) => 
           <div className="text-4xl font-extrabold">{averageRating}</div>
           <ReactRating
             style={{ maxWidth: 190 }}
-            value={Math.round(parseFloat(averageRating))}
+            value={parseFloat(averageRating)}
             itemStyles={{
               itemShapes: RoundedStar,
               activeFillColor: "#facc15",
@@ -93,7 +98,7 @@ export const ProductReviews: React.FC<ReviewsProps> = ({ reviews, product }) => 
         <div className="text-xl font-semibold">Yorumlar</div>
         <div className="flex items-center space-x-2">
           <span>Yorumları filtrele:</span>
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             className={cn(
@@ -130,7 +135,41 @@ export const ProductReviews: React.FC<ReviewsProps> = ({ reviews, product }) => 
                 ({getReviewCount(rate)})
               </span>
             </Button>
-          ))}
+          ))} */}
+
+          <ToggleGroup
+            type="multiple"
+            variant="outline"
+            className="text-xs font-semibold"
+            size="sm"
+            onValueChange={setFilterReview}
+            value={filterReview}
+          >
+            {[5, 4, 3, 2, 1].map((rate) => (
+              <ToggleGroupItem
+                value={rate.toString()}
+                className={cn(
+                  "text-xs font-semibold",
+                  filterReview?.some((fr) => Number(fr) === rate) && "border-primary bg-primary/5"
+                )}
+              >
+                <ReactRating
+                  style={{ maxWidth: 70 }}
+                  value={rate}
+                  itemStyles={{
+                    itemShapes: RoundedStar,
+                    activeFillColor: "#facc15",
+                    inactiveFillColor: "#d8d8d8",
+                  }}
+                  transition="zoom"
+                  readOnly
+                />
+                <span className="text-xs font-semibold ml-1">
+                  ({getReviewCount(rate)})
+                </span>
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
         </div>
       </div>
       <div className="space-y-5">
@@ -140,16 +179,10 @@ export const ProductReviews: React.FC<ReviewsProps> = ({ reviews, product }) => 
               Fotoğraflı değerlendirmeler:
             </span>
             <div className="flex items-center justify-start space-x-2">
-              {filterImageReviews.map((r, index) => (
-                <ClientImageComponent
-                  key={index}
-                  src={r.images[0]}
-                  alt={r.images[0]}
-                  width={96}
-                  height={96}
-                  className="border rounded-md p-1 object-contain w-24 h-24 z-0"
-                />
-              ))}
+              <ImageReviewModal
+                reviews={filterImageReviews}
+                product={product}
+              />
             </div>
           </>
         )}
@@ -172,24 +205,21 @@ export const ProductReviews: React.FC<ReviewsProps> = ({ reviews, product }) => 
                     transition="zoom"
                     readOnly
                   />
-                  <div className="text-sm font-medium">{review.userName}</div>
+                  <div className="text-sm font-medium">
+                    {review.hiddenName
+                      ? firstLastLetter(
+                          `${review.user.name} ${review.user.surname}`
+                        )
+                      : `${review.user.name} ${firstLetter(
+                          review.user.surname
+                        )}`}
+                  </div>
                 </div>
                 <div className="text-sm font-medium">
                   {moment(review.createdAt).format("LL")}
                 </div>
               </div>
               <div>{review.comment}</div>
-              {review.images && review.images.length > 0 && (
-                <ImageReviewModal
-                  product={product}
-                  images={review.images}
-                  userName={review.userName}
-                  comment={review.comment}
-                  rate={review.rate}
-                  createdAt={review.createdAt}
-                  handleClose={() => {}}
-                />
-              )}
             </div>
           ))
         ) : (

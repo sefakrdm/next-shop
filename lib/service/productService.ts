@@ -8,7 +8,12 @@ const getLatest = cache(async (limit: number | null): Promise<ProductTypes[] | n
 
   const products = await db.product.findMany({
     orderBy: { createdAt: "desc" },
-    include: { category: true, ProductImages: true, prices: true },
+    include: {
+      category: true,
+      ProductImages: true,
+      Review: { select: { rate: true } },
+      prices: true,
+    },
     take: limit || 10,
   });
 
@@ -23,7 +28,12 @@ const getFeatured = cache(async (limit: number | null): Promise<ProductTypes[] |
 
   const products = await db.product.findMany({
     where: { isFeatured: true },
-    include: { category: true, ProductImages: true, prices: true },
+    include: {
+      category: true,
+      ProductImages: true,
+      Review: { select: { rate: true } },
+      prices: true,
+    },
     orderBy: { createdAt: "desc" },
     take: limit || 10,
   });
@@ -39,7 +49,21 @@ const getBySlug = cache(async (slug: string): Promise<ProductTypes | null> => {
 
     const product = await db.product.findFirst({
       where: { slug: slug },
-      include: { category: true, ProductImages: true, Review: true, prices: true },
+      include: {
+        category: true,
+        ProductImages: true,
+        Review: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                surname: true,
+              },
+            },
+          },
+        },
+        prices: true,
+      },
       orderBy: { createdAt: "desc" },
       take: 1,
     });
@@ -55,7 +79,12 @@ const getByCategoryId = cache(async (categoryId: string, limit: number | null): 
 
   const products = await db.product.findMany({
     where: { categoryId: categoryId },
-    include: { category: true, ProductImages: true, prices: true },
+    include: {
+      category: true,
+      ProductImages: true,
+      Review: { select: { rate: true } },
+      prices: true,
+    },
     orderBy: { createdAt: "desc" },
     take: limit || 10,
   });

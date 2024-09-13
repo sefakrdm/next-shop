@@ -55,3 +55,21 @@ export function saltAndHashPassword(password: any) {
   const hash = bcrypt.hashSync(password, salt); // Synchronously hash the password
   return hash; // Return the hash directly as a string
 }
+
+export function firstLastLetter(value: string) {
+  if(value && value.length > 0) {
+    const splitValue = value.split(" ");
+    return `${splitValue[0].charAt(0)}*** ${splitValue[1].charAt(0)}***`;
+  } else {
+    return false;
+  }
+}
+
+export function firstLetter(value: string) {
+  if(value && value.length > 0) {
+    const splitValue = value.split(" ");
+    return `${splitValue[0].charAt(0)}***`;
+  } else {
+    return false;
+  }
+}
